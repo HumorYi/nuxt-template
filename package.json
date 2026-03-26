@@ -1,0 +1,50 @@
+{
+  "name": "nuxt-template",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build --dotenv .env.production",
+    "dev": "nuxt dev --dotenv .env.development",
+    "generate": "nuxt generate --dotenv .env.production",
+    "preview": "nuxt preview --dotenv .env.production",
+    "postinstall": "nuxt prepare",
+    "lint:eslint": "eslint app --ext .js,.jsx,.ts,.tsx,.vue --fix",
+    "lint:stylelint": "stylelint app/**/*.{css,less,scss,sass,vue,html} --fix",
+    "lint:prettier": "prettier --write --log-level log \"app/**/*.{js,ts,json,tsx,css,less,scss,sass,vue,html,md}\""
+  },
+  "dependencies": {
+    "@nuxt/image": "2.0.0",
+    "@nuxtjs/seo": "^4.0.2",
+    "@pinia/nuxt": "0.11.3",
+    "@takumi-rs/core": "^0.73.1",
+    "nuxt": "^4.4.2",
+    "pinia-plugin-persistedstate": "^4.7.1",
+    "vue": "^3.5.30",
+    "vue-router": "^5.0.3"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^7.7.3",
+    "@nuxt/eslint": "1.15.2",
+    "@unocss/core": "latest",
+    "@unocss/eslint-plugin": "^66.6.7",
+    "@unocss/nuxt": "latest",
+    "@unocss/preset-rem-to-px": "^66.6.6",
+    "@unocss/reset": "^66.6.7",
+    "eslint": "^9.39.4",
+    "eslint-plugin-vuejs-accessibility": "^2.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "sass": "^1.98.0",
+    "stylelint": "^17.5.0",
+    "stylelint-config-html": "^1.1.0",
+    "stylelint-config-recess-order": "^7.7.0",
+    "stylelint-config-recommended-scss": "^17.0.0",
+    "stylelint-config-recommended-vue": "^1.6.1",
+    "stylelint-config-standard": "^40.0.0",
+    "stylelint-config-standard-scss": "^17.0.0",
+    "stylelint-order": "^8.1.1",
+    "stylelint-scss": "^7.0.0",
+    "unocss": "^66.6.6",
+    "vite-plugin-eslint2": "^5.1.0"
+  }
+}

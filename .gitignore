@@ -1,0 +1,83 @@
+# ==================== 基础通用（Node.js/包管理器）====================
+# 依赖目录（核心：永不提交）
+node_modules/
+
+# 包管理器锁文件（可选：企业级建议提交 lock 文件，锁定依赖版本，此处仅注释说明）
+# package-lock.json
+# pnpm-lock.yaml
+# yarn.lock
+
+# npm 缓存
+.npm/
+# pnpm 缓存
+.pnpm-store/
+# yarn 缓存
+.yarn/
+
+# ==================== Nuxt 4 专属（构建/缓存/生成文件）====================
+# Nuxt 构建输出（新版 Nuxt 4 核心输出目录）
+.output/
+# 旧版 Nuxt 构建目录（兼容）
+dist/
+# Nuxt 缓存目录（热更新/类型生成）
+.nuxt/
+# Nuxt 生成的静态文件（nuxt generate 产物）
+public/_nuxt/
+# Nuxt 类型声明（自动生成，无需提交）
+types/
+# Nuxt 国际化缓存（若使用 @nuxtjs/i18n）
+.i18n/
+
+# ==================== 开发工具/编辑器 ====================
+# VSCode（团队统一忽略，避免编辑器配置冲突）
+.vscode/
+.idea/          # WebStorm/IntelliJ
+*.swp           # Vim 交换文件
+*.swo           # Vim 交换文件
+.DS_Store       # macOS 桌面文件
+Thumbs.db       # Windows 缩略图
+*.log           # 日志文件
+
+# ==================== 缓存/临时文件 ====================
+# ESLint 缓存（企业级配置的缓存目录）
+node_modules/.cache/eslint/
+# 测试缓存（若使用 Vitest/Jest）
+coverage/
+.nyc_output/
+# 构建缓存
+.cache/
+.tmp/
+temp/
+
+# ==================== 环境/敏感配置（核心：企业级必忽略）====================
+# 环境变量文件（包含密钥、数据库地址等敏感信息）
+# .env
+# .env.*
+!.env.example   # 保留示例文件，供团队参考配置格式
+# 密钥/证书
+*.pem
+*.key
+*.crt
+# 配置文件（本地自定义配置，不提交）
+config/local.ts
+config/local.js
+
+# ==================== 其他（避免提交的冗余文件）====================
+# 压缩包
+*.zip
+*.tar.gz
+*.rar
+# 编辑器备份文件
+*~
+# IDE 索引文件
+*.iml
+# Docker 临时文件（若使用 Docker）
+.dockerignore
+docker-compose.override.yml
+
+# ==================== 注意：以下文件/目录 切勿忽略 ====================
+# .husky/        # Husky 钩子目录（需提交，保证团队提交校验一致）
+# .github/       # CI 配置目录（需提交，保证远程校验一致）
+# .eslintrc.cjs  # ESLint 规则（需提交，保证团队规则一致）
+# nuxt.config.ts # Nuxt 核心配置（需提交）
+# .gitignore     # 本身（需提交）

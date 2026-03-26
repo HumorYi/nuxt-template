@@ -1,0 +1,34 @@
+@use './variables' as vars;
+
+@charset "utf-8";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+ul li {
+  list-style-type: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+html,
+body,
+#app,
+#root,
+/* stylelint-disable-next-line selector-id-pattern */
+#__nuxt {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  font-size: vars.$fontSize-default;
+  font-family: vars.$fontFamily-default;
+  color: vars.$color-default;
+  background-color: vars.$bgColor-default;
+}
