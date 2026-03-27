@@ -7,23 +7,23 @@
     <ul>
       <li>
         <nav>
-          <NuxtLinkPermissionPermission to="/settings">
+          <NuxtLinkPermission to="/settings">
             home
-          </NuxtLinkPermissionPermission>
+          </NuxtLinkPermission>
         </nav>
       </li>
       <li>
         <nav>
-          <NuxtLinkPermissionPermission to="/settings/base">
+          <NuxtLinkPermission to="/settings/base">
             base
-          </NuxtLinkPermissionPermission>
+          </NuxtLinkPermission>
         </nav>
       </li>
       <li>
         <nav>
-          <NuxtLinkPermissionPermission to="/settings/advance">
+          <NuxtLinkPermission to="/settings/advance">
             advance
-          </NuxtLinkPermissionPermission>
+          </NuxtLinkPermission>
         </nav>
       </li>
     </ul>

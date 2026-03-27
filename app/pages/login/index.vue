@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import Member from './components/Member.vue'
-import Panel from './components/Panel.vue'
+import Member from './_components/Member.vue'
+import Panel from './_components/Panel.vue'
 
 useSeoMeta({
-  title: '登录',
+  title: 'page.login',
 })
 
 const authApi = useAuthApi()

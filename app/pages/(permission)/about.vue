@@ -1,6 +1,6 @@
 <script setup lang="ts">
 definePageMeta({
-  title: '关于',
+  title: 'page.about',
 })
 </script>
 

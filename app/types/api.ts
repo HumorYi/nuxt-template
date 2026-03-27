@@ -93,7 +93,7 @@ export interface CustomRetryConfig {
 }
 
 export interface CustomRequestConfig {
-  /!** 超时参数写在此处，而不是 useFetch 默认位置，默认请求超时时间（毫秒），默认 10 * 1000（10 秒） */
+  /** 超时参数写在此处，而不是 useFetch 默认位置，默认请求超时时间（毫秒），默认 10 * 1000（10 秒） */
   timeout?: number
   /** 是否携带令牌（Authorization 头），默认 true */
   withToken?: boolean
@@ -162,8 +162,6 @@ export interface ApiCommonConfig
  * 每个 API 实例初始化时需传入的基础配置
  */
 export interface ApiInstanceConfig extends ApiCommonConfig {
-  /** API 基础请求地址（如 https://api.example.com），必填 */
-  baseURL: string
   /** 请求生命周期钩子函数 */
   hooks?: {
     /**
@@ -199,9 +197,10 @@ export interface ApiInstanceConfig extends ApiCommonConfig {
  * @extends Omit<FetchOptions, 'method'> - 排除原生 method，改用自定义 HttpMethod
  */
 export interface FetchOptionsExtend extends ApiCommonConfig {
+  /** API 基础请求地址（如 https://api.example.com），必填 */
+  baseURL: string
   /** HTTP 请求方法，覆盖原生 FetchOptions 的 method 类型 */
   method?: HttpMethod
-  abortController?: AbortController
 }
 
 /**

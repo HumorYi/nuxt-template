@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+
 const loadingStore = useLoadingStore()
 </script>
 
@@ -8,15 +9,17 @@ const loadingStore = useLoadingStore()
       v-if="loadingStore.state.global"
       class="global-loading"
     >
-      加载中...
+      {{ $t('loading.global') }}
     </div>
 
     <div
       v-if="loadingStore.state.test"
       class="global-loading"
     >
-      test 加载中...
+      {{ $t('loading.test') }}
     </div>
+
+    <LanguageSwitcher />
 
     <NuxtLayout>
       <NuxtPage />

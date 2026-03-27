@@ -1,6 +1,6 @@
 <script setup>
 useSeoMeta({
-  title: '页面不存在 - 404 - XX科技',
+  title: '页面不存在 - 404',
 })
 </script>
 

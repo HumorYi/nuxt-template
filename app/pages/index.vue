@@ -1,5 +1,6 @@
 <script setup>
-// 企业组织 Schema（首页/关于页必加）
+const { t } = useI18n()
+
 useHead({
   script: [
     {
@@ -7,14 +8,14 @@ useHead({
       children: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        'name': 'XX科技有限公司',
-        'legalName': 'XX科技有限公司',
-        'url': 'https://你的企业域名.com',
-        'logo': 'https://你的企业域名.com/logo.png',
+        'name': t('company.name'),
+        'legalName': t('company.legalName'),
+        'url': t('company.url'),
+        'logo': t('company.logo'),
         'contactPoint': [
           {
             '@type': 'ContactPoint',
-            'telephone': '400-XXXX-XXXX',
+            'telephone': '400',
             'contactType': 'customer service',
             'areaServed': 'CN',
             'availableLanguage': 'zh-CN',
@@ -22,8 +23,8 @@ useHead({
         ],
         'address': {
           '@type': 'PostalAddress',
-          'streetAddress': 'XX市XX区XX路XX号',
-          'addressLocality': 'XX市',
+          'streetAddress': t('company.address'),
+          'addressLocality': t('company.city'),
           'postalCode': 'XXXXXX',
           'addressCountry': 'CN',
         },
@@ -33,30 +34,25 @@ useHead({
 })
 
 useSeoMeta({
-  title: '首页 - XX科技_专业XX产品生产厂家_XX解决方案提供商',
+  title: 'company.pageTitle',
 })
-
-// defineOgImage('OgImageTemplate.takumi', {
-//   title: 'Is this thing on asdfas?',
-//   borderColor: '#86efac',
-// })
 
 useSchemaOrg([
   {
     '@type': 'Article',
-    'headline': '标题',
-    'author': [{ '@type': 'Person', 'name': '作者' }],
+    'headline': t('company.headline'),
+    'author': [{ '@type': 'Person', 'name': t('company.author') }],
     'datePublished': '2026-03-24',
   },
 ])
-
-// const appConfig = useAppConfig()
-// console.log('🚀 ~ appConfig:', appConfig)
 
 const authApi = useAuthApi()
 const userApi = useUserApi()
 const authStore = useAuthStore()
 const userStore = useUserStore()
+
+// const router = useRouter()
+// console.log(router.getRoutes())
 
 async function user1() {
   const res = await userApi.getUser1()
@@ -116,11 +112,11 @@ async function login() {
       </button>
     </div>
 
-    <!-- 企业站首页内容 -->
-    <!-- 产品展示区 -->
+    <!-- {{ $t('company.enterpriseContent') }} -->
+    <!-- {{ $t('company.productDisplay') }} -->
     <NuxtImg
       src="/product/main.jpg"
-      alt="XX核心产品 - XX科技"
+      :alt="$t('company.coreProductAlt')"
       width="1200"
       height="600"
     />

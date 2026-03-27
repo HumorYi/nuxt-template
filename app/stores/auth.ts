@@ -1,3 +1,7 @@
+import type { RouteLocationNormalizedLoadedGeneric } from 'vue-router'
+import type { ApiResponse } from '~/types/api'
+import type { LoginRes } from '~/types/auth'
+
 export const useAuthStore = defineStore(
   'auth',
   () => {
@@ -37,7 +41,7 @@ export const useAuthStore = defineStore(
 
       if (val) {
         // 调用 Token 刷新接口
-        const response = await $fetch('/refresh-token', {
+        const response = await $fetch<ApiResponse<LoginRes>>('/refresh-token', {
           baseURL: import.meta.env.DEV
             ? runtimeConfig.public.apiBase
             : runtimeConfig.public.apiUrl,
@@ -53,7 +57,7 @@ export const useAuthStore = defineStore(
       }
     }
 
-    function setToken(data: { accessToken: string, refreshToken: string }) {
+    function setToken(data: LoginRes) {
       accessToken.value = data.accessToken
       refreshToken.value = data.refreshToken
 
@@ -87,7 +91,7 @@ export const useAuthStore = defineStore(
 
       navigateTo(
         {
-          path: query.redirect || '/',
+          path: query.redirect as string || '/',
           query: { ...query, redirect: undefined },
         },
         { replace: true },

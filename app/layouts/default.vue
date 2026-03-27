@@ -1,9 +1,9 @@
 <template>
   <div>
-    <header>头部</header>
+    <header>{{ $t('layout.header') }}</header>
 
     <slot />
 
-    <footer>底部</footer>
+    <footer>{{ $t('layout.footer') }}</footer>
   </div>
 </template>

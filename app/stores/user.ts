@@ -4,23 +4,30 @@ import type {
   RouteRecordNormalized,
 } from 'vue-router'
 
+import type { UserRes, UserRoute } from '~/types/user'
 import { useUserApi } from '~/api/user'
-
-interface User {
-  id?: number
-  name?: string
-  [key: string]: unknown
-}
 
 export const useUserStore = defineStore('user', () => {
   const userApi = useUserApi()
-  const user = ref<User | null>(null)
+  const user = ref<UserRes | null>(null)
+  // 权限校验用：把接口返回的 `routes` 预先扁平化为 fullPath Set
+  // 避免每次导航都递归拼接路径，提升 permission middleware 性能。
+  const userRoutesFullPathSet = ref<Set<string>>(new Set())
 
   async function getUser() {
     const res = await userApi.getUser()
 
     if (res?.success) {
       user.value = res.data
+
+      if (res.data?.routes) {
+        userRoutesFullPathSet.value = new Set(
+          getRoutesFullPath(res.data.routes),
+        )
+      }
+      else {
+        userRoutesFullPathSet.value = new Set()
+      }
     }
   }
 
@@ -37,7 +44,7 @@ export const useUserStore = defineStore('user', () => {
     }
     else {
       const path = to.path
-      const name = (to as { name?: string }).name
+      const name = (to as RouteLocationNormalizedGeneric).name
 
       targetRoute = routes.find(
         route =>
@@ -66,7 +73,7 @@ export const useUserStore = defineStore('user', () => {
     }
 
     if (user.value?.routes) {
-      return hasDynamicRoutePermission(to, user.value?.routes)
+      return hasDynamicRoutePermission(to)
     }
 
     return true
@@ -84,15 +91,12 @@ export const useUserStore = defineStore('user', () => {
     return lastGroups.includes(role)
   }
 
-  function hasDynamicRoutePermission(
-    to: RouteLocationNormalizedGeneric,
-    routes: Record<string, unknown>[],
-  ) {
-    return getRoutesFullPath(routes).includes(to.fullPath)
+  function hasDynamicRoutePermission(to: RouteLocationNormalizedGeneric) {
+    return userRoutesFullPathSet.value.has(to.fullPath)
   }
 
   function getRoutesFullPath(
-    routes: Record<string, unknown>[],
+    routes: UserRoute[],
     parentPath = '',
   ) {
     const arr: string[] = []
