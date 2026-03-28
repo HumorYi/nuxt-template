@@ -3,24 +3,21 @@ import path from 'node:path'
 import process from 'node:process'
 
 const rootDir = process.cwd()
+const localesDir = path.join(rootDir, 'i18n', 'locales')
 
-// 定义配置数组，支持多个 watchDir 和 targetFile
-const configs = [
-  {
-    watchDir: path.join(rootDir, 'i18n/locales/zh-Hans'),
-    targetFile: path.join(rootDir, 'i18n/locales/zh-Hans.js'),
-  },
-  {
-    watchDir: path.join(rootDir, 'i18n/locales/en'),
-    targetFile: path.join(rootDir, 'i18n/locales/en.js'),
-  },
-  {
-    watchDir: path.join(rootDir, 'i18n/locales/zh-Hant-HK'),
-    targetFile: path.join(rootDir, 'i18n/locales/zh-Hant-HK.js'),
-  },
-]
+// 自动检测 locales 目录下的所有子目录，生成配置
+const configs = fs.readdirSync(localesDir, { withFileTypes: true })
+  .filter(dirent => dirent.isDirectory())
+  .map((dirent) => {
+    const dirName = dirent.name
+    return {
+      watchDir: path.join(localesDir, dirName),
+      targetFile: path.join(localesDir, `${dirName}.js`),
+    }
+  })
 
-const regExportDefault = /export default\s+(.*)/s
+// 正则表达式匹配实际的 export default 语句（不在注释中）
+const regExportDefault = /^\s*export\s+default\s+(.*)/ms
 const regSemicolonEnd = /;\s*$/
 
 function log(text) {
@@ -45,37 +42,44 @@ function updateTargetFile(watchDir, targetFile) {
 
         if (stats.isDirectory()) {
           readDir(fullPath, prefix ? `${prefix}.${file}` : file)
-        } else if (stats.isFile() && path.extname(file) === '.js') {
+        }
+        else if (stats.isFile() && path.extname(file) === '.js') {
           const key = prefix ? `${prefix}.${path.basename(file, '.js')}` : path.basename(file, '.js')
 
           // 读取文件内容
           const fileContent = fs.readFileSync(fullPath, 'utf8')
           // 提取 export default 后的内容
           const match = fileContent.match(regExportDefault)
+          let content = {}
+
+          // 只有当找到 export default 时才尝试解析内容
           if (match && match[1]) {
             try {
               // 移除末尾的分号
               const contentStr = match[1].replace(regSemicolonEnd, '')
               // 使用 Function 构造函数代替 eval，更安全
               // eslint-disable-next-line no-new-func
-              const content = new Function(`return ${contentStr}`)()
-
-              // 按路径设置嵌套对象
-              const keys = key.split('.')
-              let current = result
-
-              for (let i = 0; i < keys.length - 1; i++) {
-                if (!current[keys[i]]) {
-                  current[keys[i]] = {}
-                }
-                current = current[keys[i]]
-              }
-
-              current[keys.at(-1)] = content
-            } catch (error) {
+              content = new Function(`return ${contentStr}`)()
+            }
+            catch (error) {
               console.error(`Error parsing file ${fullPath}:`, error)
             }
           }
+
+          // 按路径设置嵌套对象 - 即使没有 export default 也创建目录结构
+          const keys = key.split('.')
+          let current = result
+
+          for (let i = 0; i < keys.length - 1; i++) {
+            if (!current[keys[i]]) {
+              current[keys[i]] = {}
+            }
+
+            current = current[keys[i]]
+          }
+
+          // 只有当文件有内容时才添加到结果中
+          current[keys.at(-1)] = content
         }
       })
     }

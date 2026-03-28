@@ -4,11 +4,13 @@ import process from 'node:process'
 
 const rootDir = process.cwd()
 
-const sourceDir = path.join(rootDir, 'i18n/locales/zh-Hans')
-const targetDirs = [
-  path.join(rootDir, 'i18n/locales/en'),
-  path.join(rootDir, 'i18n/locales/zh-Hant-HK'),
-]
+const localesDir = path.join(rootDir, 'i18n', 'locales')
+const sourceDir = path.join(localesDir, 'zh')
+
+// 读取 locales 目录下的所有子目录，过滤掉 sourceDir 对应的目录
+const targetDirs = fs.readdirSync(localesDir, { withFileTypes: true })
+  .filter(dirent => dirent.isDirectory() && dirent.name !== path.basename(sourceDir))
+  .map(dirent => path.join(localesDir, dirent.name))
 
 const regExportDefault = /export default\s+(.*)/s
 const regSemicolonEnd = /;\s*$/
@@ -55,6 +57,18 @@ function ensureDir(dirPath) {
   }
 }
 
+// 递归同步对象内容
+function syncObject(sourceObj, targetObj, fn) {
+  Object.keys(sourceObj).forEach((key) => {
+    if (!(key in targetObj)) {
+      fn(sourceObj, targetObj, key)
+    }
+    else if (typeof sourceObj[key] === 'object' && typeof targetObj[key] === 'object') {
+      syncObject(sourceObj[key], targetObj[key], fn)
+    }
+  })
+}
+
 // 递归同步文件
 function syncFiles(sourcePath, targetPath) {
   const sourceStats = fs.statSync(sourcePath)
@@ -86,18 +100,6 @@ function syncFiles(sourcePath, targetPath) {
     // 同步内容：保持相同 key 的值，添加新 key，删除不存在的 key
     const syncedContent = { ...targetContent }
     let isChanged = false
-
-    // 递归同步对象内容
-    function syncObject(sourceObj, targetObj, fn) {
-      Object.keys(sourceObj).forEach((key) => {
-        if (!(key in targetObj)) {
-          fn(sourceObj, targetObj, key)
-        }
-        else if (typeof sourceObj[key] === 'object' && typeof targetObj[key] === 'object') {
-          syncObject(sourceObj[key], targetObj[key], fn)
-        }
-      })
-    }
 
     // 增
     syncObject(sourceContent, syncedContent, (sourceObj, targetObj, key) => {

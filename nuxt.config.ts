@@ -82,7 +82,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      htmlAttrs: { lang: defaultLocale },
+      htmlAttrs: { lang: 'zh-CN' },
       title: process.env.NUXT_SITE_NAME || '',
       link: [
         { rel: 'icon', href: '/favicon.ico' },
@@ -97,11 +97,11 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'node-server',
     // preset: 'static',
-    // prerender: {
-    //   routes: ['/'],
-    //   ignore: ['/admin/**'],
-    //   crawlLinks: true, // 自动爬取站内链接，补充预渲染路由
-    // },
+    prerender: {
+      // routes: ['/'],
+      // ignore: ['/403', '/404'],
+      crawlLinks: true, // 自动爬取站内链接，补充预渲染路由
+    },
     compressPublicAssets: { brotli: true, gzip: true },
     devProxy: {
       [process.env.NUXT_PUBLIC_API_BASE as string]: {
@@ -146,13 +146,14 @@ export default defineNuxtConfig({
   },
 
   i18n: {
+    baseUrl: process.env.NUXT_SITE_URL,
     defaultLocale,
     locales: [
-      { code: defaultLocale, name: '简体中文', file: 'zh-Hans.js' },
-      { code: 'zh-Hant-HK', name: '繁体中文', file: 'zh-Hant-HK.js' },
-      { code: 'en', name: 'English', file: 'en.js' },
+      { code: defaultLocale, language: 'zh-Hans', name: '简体中文', file: 'zh.js' },
+      { code: 'zh-Hant', language: 'zh-Hant', name: '繁体中文', file: 'zh-Hant.js' },
+      { code: 'en', language: 'en-US', name: 'English', file: 'en.js' },
     ],
-    // vueI18n: './i18n/i18n.config.ts',
+    vueI18n: './i18n/i18n.config.ts',
     strategy: 'no_prefix',
     detectBrowserLanguage: {
       fallbackLocale: defaultLocale,

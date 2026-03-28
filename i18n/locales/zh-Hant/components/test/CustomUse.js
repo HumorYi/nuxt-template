@@ -1,5 +1,5 @@
 export default {
-  "title": "Custom Use",
+  "title": "自定義測試 嵌套",
   "test": {
     "age": "年龄"
   }
