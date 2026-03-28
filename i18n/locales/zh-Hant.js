@@ -5,6 +5,14 @@ export default {
   "components": {
     "CustomTest": {
       "title": "自定义测试"
+    },
+    "test": {
+      "CustomUse": {
+        "title": "自定義測試 嵌套",
+        "test": {
+          "age": "年龄"
+        }
+      }
     }
   },
   "error": {
@@ -33,10 +41,37 @@ export default {
     "login": {
       "login": "登录",
       "username": "用户名",
-      "password": "密码"
+      "password": "密码",
+      "message": {
+        "loginFailed": "登录失败",
+        "loginSuccess": "登录成功"
+      }
     },
     "[...slug]": {
       "noFound": "页面不存在"
+    },
+    "(auth)": {
+      "concat": {
+        "desc": "联系我们"
+      }
+    },
+    "(permission)": {
+      "user": {
+        "login": "登录",
+        "about": "关于",
+        "contact": "联系我们",
+        "home": "首页",
+        "userCenter": "用户中心",
+        "userCenterParent": "用户中心（父路由）",
+        "backToUserHome": "回到用户首页",
+        "basicInfo": "基础信息",
+        "advancedSettings": "高级设置",
+        "childRouteContent": "子路由内容会渲染在这个 NuxtPage 标签位置",
+        "forbiddenAccess": "禁止访问 - 403",
+        "noPermissionToAccess": "你没有权限访问该页面。",
+        "forbiddenAccess403": "403 禁止访问",
+        "noPermissionToView": "你没有权限查看该内容。"
+      }
     }
   },
   "layouts": {
@@ -57,36 +92,5 @@ export default {
     "headline": "标题",
     "author": "作者",
     "coreProductAlt": "核心产品 - 科技"
-  },
-  "components.test": {
-    "CustomUse": {
-      "title": "自定義測試 嵌套",
-      "test": {
-        "age": "年龄"
-      }
-    }
-  },
-  "pages.(auth)": {
-    "concat": {
-      "desc": "联系我们"
-    }
-  },
-  "pages.(permission)": {
-    "user": {
-      "login": "登录",
-      "about": "关于",
-      "contact": "联系我们",
-      "home": "首页",
-      "userCenter": "用户中心",
-      "userCenterParent": "用户中心（父路由）",
-      "backToUserHome": "回到用户首页",
-      "basicInfo": "基础信息",
-      "advancedSettings": "高级设置",
-      "childRouteContent": "子路由内容会渲染在这个 NuxtPage 标签位置",
-      "forbiddenAccess": "禁止访问 - 403",
-      "noPermissionToAccess": "你没有权限访问该页面。",
-      "forbiddenAccess403": "403 禁止访问",
-      "noPermissionToView": "你没有权限查看该内容。"
-    }
   }
 };

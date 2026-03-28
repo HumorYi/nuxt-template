@@ -30,7 +30,7 @@ function updateTargetFile(watchDir, targetFile) {
     const result = {}
 
     // 递归读取目录
-    function readDir(dir, prefix = '') {
+    function readDir(dir, prefix = []) {
       const files = fs.readdirSync(dir)
 
       files.forEach((file) => {
@@ -38,10 +38,10 @@ function updateTargetFile(watchDir, targetFile) {
         const stats = fs.statSync(fullPath)
 
         if (stats.isDirectory()) {
-          readDir(fullPath, prefix ? `${prefix}.${file}` : file)
+          readDir(fullPath, [...prefix, file])
         }
         else if (stats.isFile() && path.extname(file) === '.js') {
-          const keys = prefix ? [prefix, path.basename(file, '.js')] : [path.basename(file, '.js')]
+          const keys = [...prefix, path.basename(file, '.js')]
 
           // 读取文件内容
           const fileContent = fs.readFileSync(fullPath, 'utf8')

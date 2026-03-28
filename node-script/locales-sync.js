@@ -20,6 +20,38 @@ function log(text) {
   console.log(`sync-locales.js: ${text}`)
 }
 
+/**
+ * 多层JSON扁平化
+ * @param {object} data - 嵌套的JSON对象
+ * @param {string} [parentKey] - 递归父级键（内部使用）
+ * @param {string} [separator] - 键分隔符
+ * @returns {object} 扁平化后的单层对象
+ */
+function flattenObject(data, parentKey = '', separator = '.') {
+  // 存储扁平化结果
+  const result = {}
+
+  // 遍历对象/数组的所有键值对
+  for (const [key, value] of Object.entries(data)) {
+    // 拼接当前完整键名
+    const currentKey = parentKey ? `${parentKey}${separator}${key}` : key
+
+    // 判断值是否为 嵌套对象（需要递归）
+    const isNested = typeof value === 'object' && value !== null
+
+    if (isNested) {
+      // 递归扁平化嵌套结构
+      Object.assign(result, flattenObject(value, currentKey, separator))
+    }
+    else {
+      // 基本类型（字符串/数字/布尔/null）直接赋值
+      result[currentKey] = value
+    }
+  }
+
+  return result
+}
+
 // 读取文件内容并解析为对象
 function readFileContent(filePath) {
   try {
@@ -51,15 +83,49 @@ function writeFileContent(filePath, content) {
 }
 
 // 递归同步对象内容
-function syncObject(sourceObj, targetObj, fn) {
+function syncObject(sourceObj, targetObj, fn, exist = false) {
   Object.keys(sourceObj).forEach((key) => {
-    if (!(key in targetObj)) {
+    if (key in targetObj) {
+      if (typeof sourceObj[key] === 'object' && typeof targetObj[key] === 'object') {
+        syncObject(sourceObj[key], targetObj[key], fn)
+      }
+      else if (exist) {
+        fn(sourceObj, targetObj, key)
+      }
+    }
+    else {
       fn(sourceObj, targetObj, key)
     }
-    else if (typeof sourceObj[key] === 'object' && typeof targetObj[key] === 'object') {
-      syncObject(sourceObj[key], targetObj[key], fn)
-    }
   })
+}
+
+function getExistVal(val, flatSourceData, flatTargetData) {
+  if (typeof val === 'string') {
+    const keys = []
+
+    for (const [k, v] of Object.entries(flatSourceData)) {
+      if (v === val) {
+        keys.push(k)
+      }
+    }
+
+    for (const k of keys) {
+      if (flatTargetData[k]) {
+        return flatTargetData[k]
+      }
+    }
+  }
+  else if (typeof val === 'object') {
+    const result = JSON.parse(JSON.stringify(val))
+
+    for (const [k, v] of Object.entries(result)) {
+      result[k] = getExistVal(v, flatSourceData, flatTargetData)
+    }
+
+    return result
+  }
+
+  return val
 }
 
 // 同步单个目标文件
@@ -70,28 +136,30 @@ function syncTargetFile(targetFile) {
   // 构建完整的源数据对象
   const sourceData = readFileContent(sourceFile)
 
-  // 读取目标文件内容
-  const targetContent = readFileContent(targetFile)
-
   // 同步内容：保持相同 key 的值，添加新 key，删除不存在的 key
-  const syncedContent = { ...targetContent }
+  const targetData = readFileContent(targetFile)
   let isChanged = false
 
-  // 增
-  syncObject(sourceData, syncedContent, (sourceObj, targetObj, key) => {
-    targetObj[key] = sourceObj[key]
+  const flatSourceData = flattenObject(sourceData)
+  const flatTargetData = flattenObject(targetData)
+
+  // 增/改
+  syncObject(sourceData, targetData, (sourceObj, targetObj, key) => {
+    targetObj[key] = getExistVal(sourceObj[key], flatSourceData, flatTargetData)
+    console.log(`Add ${key}:`, targetObj[key])
+
     isChanged = true
-  })
+  }, true)
 
   // 删
-  syncObject(syncedContent, sourceData, (sourceObj, targetObj, key) => {
+  syncObject(targetData, sourceData, (sourceObj, targetObj, key) => {
     delete sourceObj[key]
     isChanged = true
   })
 
   if (isChanged) {
     // 写入同步后的内容
-    writeFileContent(targetFile, syncedContent)
+    writeFileContent(targetFile, targetData)
   }
 }
 
