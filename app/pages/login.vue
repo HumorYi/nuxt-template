@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+const pageLang = usePageLang('login')
+const pageMessageLang = usePageMessageLang(pageLang)
+
 const authApi = useAuthApi()
 const authStore = useAuthStore()
 const userStore = useUserStore()
@@ -9,13 +12,17 @@ async function login() {
     password: 'password',
   })
 
-  if (res?.success) {
+  const success = res?.success
+
+  if (success) {
     authStore.setToken(res.data)
 
     await userStore.getUser()
 
     authStore.toLoginRedirect()
   }
+
+  console.log(pageMessageLang(success ? 'loginSuccess' : 'loginFailed'))
 }
 </script>
 
@@ -23,7 +30,7 @@ async function login() {
   <div>
     <div>
       <button @click="login">
-        login
+        {{ pageLang('login') }}
       </button>
     </div>
 
