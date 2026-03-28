@@ -1,6 +1,0 @@
-export default {
-  "title": "Custom Use",
-  "test": {
-    "age": "年龄"
-  }
-};

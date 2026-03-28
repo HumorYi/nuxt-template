@@ -5,11 +5,12 @@ import process from 'node:process'
 const rootDir = process.cwd()
 
 const localesDir = path.join(rootDir, 'i18n', 'locales')
-const sourceDir = path.join(localesDir, 'zh')
+const sourceFileName = 'zh.js'
+const sourceFile = path.join(localesDir, sourceFileName)
 
-// 读取 locales 目录下的所有子目录，过滤掉 sourceDir 对应的目录
-const targetDirs = fs.readdirSync(localesDir, { withFileTypes: true })
-  .filter(dirent => dirent.isDirectory() && dirent.name !== path.basename(sourceDir))
+// 读取 locales 目录下的所有 .js 文件，过滤掉 sourceFile 对应的文件
+const targetFiles = fs.readdirSync(localesDir, { withFileTypes: true })
+  .filter(dirent => dirent.isFile() && dirent.name.endsWith('.js') && dirent.name !== sourceFileName)
   .map(dirent => path.join(localesDir, dirent.name))
 
 const regExportDefault = /export default\s+(.*)/s
@@ -49,14 +50,6 @@ function writeFileContent(filePath, content) {
   }
 }
 
-// 确保目录存在
-function ensureDir(dirPath) {
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true })
-    log(`Created directory: ${dirPath}`)
-  }
-}
-
 // 递归同步对象内容
 function syncObject(sourceObj, targetObj, fn) {
   Object.keys(sourceObj).forEach((key) => {
@@ -69,54 +62,36 @@ function syncObject(sourceObj, targetObj, fn) {
   })
 }
 
-// 递归同步文件
-function syncFiles(sourcePath, targetPath) {
-  const sourceStats = fs.statSync(sourcePath)
+// 同步单个目标文件
+function syncTargetFile(targetFile) {
+  const targetName = path.basename(targetFile)
+  log(`Syncing to ${targetName}...`)
 
-  if (sourceStats.isDirectory()) {
-    // 确保目标目录存在
-    ensureDir(targetPath)
+  // 构建完整的源数据对象
+  const sourceData = readFileContent(sourceFile)
 
-    // 读取源目录下的所有文件
-    const files = fs.readdirSync(sourcePath)
+  // 读取目标文件内容
+  const targetContent = readFileContent(targetFile)
 
-    files.forEach((file) => {
-      const sourceFile = path.join(sourcePath, file)
-      const targetFile = path.join(targetPath, file)
-      syncFiles(sourceFile, targetFile)
-    })
-  }
-  else if (sourceStats.isFile() && path.extname(sourcePath) === '.js') {
-    // 读取源文件内容
-    const sourceContent = readFileContent(sourcePath)
+  // 同步内容：保持相同 key 的值，添加新 key，删除不存在的 key
+  const syncedContent = { ...targetContent }
+  let isChanged = false
 
-    if (!fs.existsSync(targetPath)) {
-      writeFileContent(targetPath, sourceContent)
-      return
-    }
+  // 增
+  syncObject(sourceData, syncedContent, (sourceObj, targetObj, key) => {
+    targetObj[key] = sourceObj[key]
+    isChanged = true
+  })
 
-    const targetContent = readFileContent(targetPath)
+  // 删
+  syncObject(syncedContent, sourceData, (sourceObj, targetObj, key) => {
+    delete sourceObj[key]
+    isChanged = true
+  })
 
-    // 同步内容：保持相同 key 的值，添加新 key，删除不存在的 key
-    const syncedContent = { ...targetContent }
-    let isChanged = false
-
-    // 增
-    syncObject(sourceContent, syncedContent, (sourceObj, targetObj, key) => {
-      targetObj[key] = sourceObj[key]
-      isChanged = true
-    })
-
-    // 删
-    syncObject(syncedContent, sourceContent, (sourceObj, targetObj, key) => {
-      delete sourceObj[key]
-      isChanged = true
-    })
-
-    if (isChanged) {
-      // 写入同步后的内容
-      writeFileContent(targetPath, syncedContent)
-    }
+  if (isChanged) {
+    // 写入同步后的内容
+    writeFileContent(targetFile, syncedContent)
   }
 }
 
@@ -125,15 +100,14 @@ function startSync() {
   log('Starting to sync locales...')
 
   // 检查源目录是否存在
-  if (!fs.existsSync(sourceDir)) {
-    log(`Source directory ${sourceDir} does not exist!`)
+  if (!fs.existsSync(sourceFile)) {
+    log(`Source directory ${sourceFile} does not exist!`)
     return
   }
 
-  // 同步到每个目标目录
-  targetDirs.forEach((targetDir) => {
-    log(`Syncing to ${path.basename(targetDir)}...`)
-    syncFiles(sourceDir, targetDir)
+  // 同步到每个目标文件
+  targetFiles.forEach((targetFile) => {
+    syncTargetFile(targetFile)
   })
 
   log('Sync completed!')

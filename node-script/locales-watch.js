@@ -5,16 +5,13 @@ import process from 'node:process'
 const rootDir = process.cwd()
 const localesDir = path.join(rootDir, 'i18n', 'locales')
 
-// 自动检测 locales 目录下的所有子目录，生成配置
-const configs = fs.readdirSync(localesDir, { withFileTypes: true })
-  .filter(dirent => dirent.isDirectory())
-  .map((dirent) => {
-    const dirName = dirent.name
-    return {
-      watchDir: path.join(localesDir, dirName),
-      targetFile: path.join(localesDir, `${dirName}.js`),
-    }
-  })
+// 监听目录及生成目标文件
+const configs = [
+  {
+    watchDir: path.join(localesDir, 'zh'),
+    targetFile: path.join(localesDir, 'zh.js'),
+  },
+]
 
 // 正则表达式匹配实际的 export default 语句（不在注释中）
 const regExportDefault = /^\s*export\s+default\s+(.*)/ms
