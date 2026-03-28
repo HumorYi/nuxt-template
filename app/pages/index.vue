@@ -1,5 +1,6 @@
 <script setup>
-const { t } = useI18n()
+const config = useRuntimeConfig()
+const siteLang = useSiteLang()
 
 useHead({
   script: [
@@ -8,10 +9,10 @@ useHead({
       children: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        'name': t('company.name'),
-        'legalName': t('company.legalName'),
-        'url': t('company.url'),
-        'logo': t('company.logo'),
+        'name': siteLang('name'),
+        'legalName': siteLang('legalName'),
+        'url': config.public.site.url,
+        'logo': config.public.site.logo,
         'contactPoint': [
           {
             '@type': 'ContactPoint',
@@ -23,8 +24,8 @@ useHead({
         ],
         'address': {
           '@type': 'PostalAddress',
-          'streetAddress': t('company.address'),
-          'addressLocality': t('company.city'),
+          'streetAddress': siteLang('address'),
+          'addressLocality': siteLang('city'),
           'postalCode': 'XXXXXX',
           'addressCountry': 'CN',
         },
@@ -34,14 +35,14 @@ useHead({
 })
 
 useSeoMeta({
-  title: 'company.pageTitle',
+  title: 'site.pageTitle',
 })
 
 useSchemaOrg([
   {
     '@type': 'Article',
-    'headline': t('company.headline'),
-    'author': [{ '@type': 'Person', 'name': t('company.author') }],
+    'headline': siteLang('headline'),
+    'author': [{ '@type': 'Person', 'name': siteLang('author') }],
     'datePublished': '2026-03-24',
   },
 ])
@@ -112,11 +113,9 @@ async function login() {
       </button>
     </div>
 
-    <!-- {{ $t('company.enterpriseContent') }} -->
-    <!-- {{ $t('company.productDisplay') }} -->
     <NuxtImg
       src="/product/main.jpg"
-      :alt="$t('company.coreProductAlt')"
+      :alt="siteLang('coreProductAlt')"
       width="1200"
       height="600"
     />

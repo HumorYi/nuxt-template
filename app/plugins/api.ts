@@ -67,8 +67,8 @@ const customRequestConfig: CustomRequestConfig = {
 const customToastConfig: CustomToastConfig = {
   timeout: 'error.timeout',
   networkError: 'error.networkError',
-  tokenExpired: 'auth.tokenExpired',
-  noPermission: 'auth.noPermission',
+  tokenExpired: 'error.tokenExpired',
+  tokenRefreshFailed: 'error.tokenRefreshFailed',
   serverError: 'error.serverError',
   configError: 'error.configError',
   duplicateRequest: 'error.duplicateRequest',
@@ -625,7 +625,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
 
     // 错误类型匹配
-    if (message.includes('timeout')) {
+    if (message.includes('tokenRefreshFailed')) {
+      errorMsg = lastCustomToastConfig.tokenRefreshFailed
+    }
+    else if (message.includes('timeout')) {
       errorMsg = lastCustomToastConfig.timeout
     }
     else if (message.endsWith('canceled')) {
@@ -641,20 +644,14 @@ export default defineNuxtPlugin((nuxtApp) => {
     else if (status === 401) {
       errorMsg = lastCustomToastConfig.tokenExpired
     }
-    else if (status === 403) {
-      errorMsg = lastCustomToastConfig.noPermission
-    }
     else if (status >= 500) {
       errorMsg = lastCustomToastConfig.serverError
     }
     else if ((data as ErrorResponse).success === false) {
-      errorMsg = lastCustomToastConfig.businessError?.replace(
-        '{msg}',
-        data.message || '未知错误',
-      )
+      errorMsg = lastCustomToastConfig.businessError?.replace('{msg}', data.message || '')
     }
     else {
-      errorMsg = `请求失败：${message}`
+      errorMsg = message || lastCustomToastConfig.unknownError
     }
 
     // 执行错误钩子
@@ -663,7 +660,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
     catch (e) {
       console.error('[API] 错误处理失败', e)
-      errorMsg = '请求处理异常，请稍后重试'
+      errorMsg = lastCustomToastConfig.requestError
     }
     finally {
       // 客户端弹出提示
@@ -725,7 +722,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         // 调用store刷新token
         const newToken = await authStore.getRefreshToken()
         if (!newToken) {
-          throw new Error('auth.tokenRefreshFailed')
+          throw new Error('tokenRefreshFailed')
         }
 
         // 刷新成功：通知所有等待请求
@@ -799,7 +796,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       if (tokenRefreshManager.isRefreshing && lastCustomRequestConfig.withToken) {
         const refreshSuccess = await tokenRefreshManager.waitForRefresh()
         if (!refreshSuccess) {
-          throw new Error('auth.tokenRefreshFailed')
+          throw new Error('tokenRefreshFailed')
         }
         return retryRequest({ abortKey, apiConfig, options, fetchFn, retry, isAfterRefresh: true })
       }
@@ -857,7 +854,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       if (tokenRefreshManager.isRefreshing) {
         const refreshSuccess = await tokenRefreshManager.waitForRefresh()
         if (!refreshSuccess) {
-          throw new Error('auth.tokenRefreshFailed')
+          throw new Error('tokenRefreshFailed')
         }
       }
       else {
@@ -891,7 +888,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         ...apiConfig.customRequest?.headers,
         normalizedHeaders,
       }
-      const lastCustomRequesetConfig: CustomRequestConfig = {
+      const lastCustomRequestConfig: CustomRequestConfig = {
         ...customRequestConfig,
         ...apiConfig.customRequest,
         ...options.customRequest,
@@ -906,7 +903,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         normalizedHeaders[lastHeaders.csrfToken] = csrfToken
       }
       // 添加认证Token
-      if (token && lastCustomRequesetConfig.withToken && lastHeaders.token) {
+      if (token && lastCustomRequestConfig.withToken && lastHeaders.token) {
         normalizedHeaders[lastHeaders.token] = `Bearer ${token}`
       }
 
@@ -920,7 +917,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
       // FormData序列化
       if (
-        lastCustomRequesetConfig.serializeForm
+        lastCustomRequestConfig.serializeForm
         && processedOptions.body instanceof FormData
       ) {
         processedOptions.body = Object.fromEntries(processedOptions.body.entries())
@@ -963,7 +960,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     ): Promise<T> => {
       const { baseURL = '' } = options
       const fullUrl = `${baseURL}${url}`
-      const lastCustomRequesetConfig: CustomRequestConfig = {
+      const lastCustomRequestConfig: CustomRequestConfig = {
         ...customRequestConfig,
         ...apiConfig.customRequest,
         ...options.customRequest,
@@ -972,7 +969,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       const {
         abortKey = generateAbortKey(baseURL, url, method, options, apiConfig),
         componentKey,
-      } = lastCustomRequesetConfig
+      } = lastCustomRequestConfig
 
       // 请求元数据
       const requestMeta: RequestMeta = {

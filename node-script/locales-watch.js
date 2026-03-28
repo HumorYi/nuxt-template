@@ -41,7 +41,7 @@ function updateTargetFile(watchDir, targetFile) {
           readDir(fullPath, prefix ? `${prefix}.${file}` : file)
         }
         else if (stats.isFile() && path.extname(file) === '.js') {
-          const key = prefix ? `${prefix}.${path.basename(file, '.js')}` : path.basename(file, '.js')
+          const keys = prefix ? [prefix, path.basename(file, '.js')] : [path.basename(file, '.js')]
 
           // 读取文件内容
           const fileContent = fs.readFileSync(fullPath, 'utf8')
@@ -64,7 +64,6 @@ function updateTargetFile(watchDir, targetFile) {
           }
 
           // 按路径设置嵌套对象 - 即使没有 export default 也创建目录结构
-          const keys = key.split('.')
           let current = result
 
           for (let i = 0; i < keys.length - 1; i++) {

@@ -1,8 +1,6 @@
 export default {
   name: "科技有限公司",
   legalName: "科技有限公司",
-  url: "https://你的企业域名.com",
-  logo: "https://你的企业域名.com/logo.png",
   address: "省市区路号",
   city: "市",
   contactTitle: "联系我们 - 科技_400_地址/邮箱/在线咨询",
@@ -11,7 +9,5 @@ export default {
   pageTitle: "首页 - 科技_专业产品生产厂家_解决方案提供商",
   headline: "标题",
   author: "作者",
-  enterpriseContent: "企业站首页内容",
-  productDisplay: "产品展示区",
   coreProductAlt: "核心产品 - 科技"
 };

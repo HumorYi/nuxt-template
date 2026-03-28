@@ -125,10 +125,14 @@ export interface CustomToastConfig {
   networkError?: string
   /** 令牌过期提示文案，默认 '登录状态已过期，请重新登录' */
   tokenExpired?: string
+  /** 令牌刷新失败提示文案，默认 'Token刷新失败' */
+  tokenRefreshFailed?: string
   /** 无权限提示文案，默认 '暂无权限执行该操作，请联系管理员' */
   noPermission?: string
   /** 服务器错误提示文案，默认 '服务器内部错误，请稍后重试' */
   serverError?: string
+  /** 未知错误提示文案，默认 '未知错误' */
+  unknownError?: string
   /** 配置错误提示文案，默认 'API 配置异常，请检查接口地址' */
   configError?: string
   /** 重复请求提示文案，默认 '当前请求正在处理中，请勿重复操作' */
@@ -139,6 +143,8 @@ export interface CustomToastConfig {
   csrfError?: string
   /** 令牌为空提示文案，默认 '登录令牌为空，请重新登录' */
   emptyToken?: string
+  /** 请求处理异常提示文案，默认 '请求处理异常，请稍后重试' */
+  requestError?: string
 }
 
 export interface FetchOptionConfig {

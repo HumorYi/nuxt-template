@@ -1,24 +1,28 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useUserLang } from '~/composables/useLang'
+
+const userLang = useUserLang()
+</script>
 
 <template>
   <div class="index">
-    <h2>{{ $t('page.userCenterParent') }}</h2>
+    <h2>{{ userLang('userCenterParent') }}</h2>
 
     <!-- 子路由导航 -->
     <ul>
       <li>
         <NuxtLinkPermission to="/user">
-          {{ $t('page.backToUserHome') }}
+          {{ userLang('backToUserHome') }}
         </NuxtLinkPermission>
       </li>
       <li>
         <NuxtLinkPermission to="/user/base">
-          {{ $t('page.basicInfo') }}
+          {{ userLang('basicInfo') }}
         </NuxtLinkPermission>
       </li>
       <li>
         <NuxtLinkPermission to="/user/advance">
-          {{ $t('page.advancedSettings') }}
+          {{ userLang('advancedSettings') }}
         </NuxtLinkPermission>
       </li>
     </ul>

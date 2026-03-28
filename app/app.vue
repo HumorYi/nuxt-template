@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+import { useLoadingLang } from './composables/useLang'
 
+const loadingLang = useLoadingLang()
 const loadingStore = useLoadingStore()
 </script>
 
@@ -9,14 +11,14 @@ const loadingStore = useLoadingStore()
       v-if="loadingStore.state.global"
       class="global-loading"
     >
-      {{ $t('loading.global') }}
+      {{ loadingLang('global') }}
     </div>
 
     <div
       v-if="loadingStore.state.test"
       class="global-loading"
     >
-      {{ $t('loading.test') }}
+      {{ loadingLang('test') }}
     </div>
 
     <LanguageSwitcher />

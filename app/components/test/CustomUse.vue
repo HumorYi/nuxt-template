@@ -1,10 +1,10 @@
 <script setup lang="ts">
-
+const componentLang = useComponentLang('test.CustomUse')
 </script>
 
 <template>
   <div class="custom-use">
-    {{ $t('components.test.CustomUse.title') }}
+    {{ componentLang('title') }}
   </div>
 </template>
 

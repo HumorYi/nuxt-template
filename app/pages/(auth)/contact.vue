@@ -1,14 +1,16 @@
 <script setup lang="ts">
+const authPageLang = useAuthPageLang('contact')
+
 useSeoMeta({
-  title: 'company.contactTitle',
-  description: 'company.contactDescription',
-  keywords: 'company.contactKeywords',
+  title: 'site.contactTitle',
+  description: 'site.contactDescription',
+  keywords: 'site.contactKeywords',
 })
 </script>
 
 <template>
   <div class="contact bg-d">
-    contact
+    {{ authPageLang('desc') }}
   </div>
 </template>
 

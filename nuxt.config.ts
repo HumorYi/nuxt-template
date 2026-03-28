@@ -32,6 +32,10 @@ export default defineNuxtConfig({
         // customLoading: { enable: true, key: 'global' },
         // timeout: 1 * 1000
       } as ApiPluginConfig,
+      site: {
+        url: process.env.NUXT_SITE_URL || '',
+        logo: process.env.NUXT_SITE_LOGO || '',
+      }
     },
   },
 

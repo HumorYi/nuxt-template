@@ -1,189 +1,92 @@
 export default {
-  "auth": {
-    "login": "Login",
-    "logout": "Logout",
-    "username": "Username",
-    "password": "Password",
-    "rememberMe": "Remember me",
-    "forgotPassword": "Forgot password",
-    "loginSuccess": "Login successful",
-    "loginFailed": "Login failed",
-    "logoutSuccess": "Logout successful",
-    "tokenExpired": "Login session has expired, please login again",
-    "noPermission": "No permission to perform this operation, please contact administrator",
-    "loginTitle": "Welcome back",
-    "loginSubtitle": "Please enter your username and password",
-    "tokenRefreshFailed": "Token refresh failed"
-  },
   "common": {
-    "loading": "Loading...",
-    "submit": "Submit",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "delete": "Delete",
-    "edit": "Edit",
-    "add": "Add",
-    "save": "Save",
-    "search": "Search",
-    "reset": "Reset",
-    "export": "Export",
-    "import": "Import",
-    "download": "Download",
-    "upload": "Upload",
-    "refresh": "Refresh",
-    "back": "Back",
-    "close": "Close",
-    "yes": "Yes",
-    "no": "No",
-    "all": "All",
-    "select": "Select",
-    "clear": "Clear",
-    "copy": "Copy",
-    "paste": "Paste",
-    "cut": "Cut",
-    "undo": "Undo",
-    "redo": "Redo",
-    "print": "Print",
-    "preview": "Preview",
-    "detail": "Detail",
-    "more": "More",
-    "expand": "Expand",
-    "collapse": "Collapse",
-    "fullscreen": "Fullscreen",
-    "exitFullscreen": "Exit Fullscreen"
-  },
-  "company": {
-    "name": " Technology Co., Ltd.",
-    "legalName": " Technology Co., Ltd.",
-    "url": "https://your-domain.com",
-    "logo": "https://your-domain.com/logo.png",
-    "address": " Road,  District,  City,  Province",
-    "city": " City",
-    "contactTitle": "Contact Us -  Technology_400Address/Address/Email/Online Consultation",
-    "contactDescription": "Welcome to contact us for cooperation.",
-    "contactKeywords": " Technology, Contact Us, 400 Phone, Company Address",
-    "pageTitle": "Home -  Technology_Professional  Product Manufacturer_ Solution Provider",
-    "headline": "Headline",
-    "author": "Author",
-    "enterpriseContent": "Enterprise Website Home Content",
-    "productDisplay": "Product Display Area",
-    "coreProductAlt": " Core Product -  Technology"
+    "backHome": "返回首页"
   },
   "components": {
-    "CusteomTest": {
-      "title": "Custom Test"
-    },
-    "test": {
-      "CustomUse": {
-        "title": "Custom Use",
-        "test": {
-          "age": "年龄"
-        }
-      }
+    "CustomTest": {
+      "title": "自定义测试"
     }
   },
   "error": {
-    "403": "Access denied",
-    "404": "Page not found",
-    "500": "Server error",
     "networkError": "Network error, please check your connection",
     "timeout": "Request timeout, please check network and try again",
     "serverError": "Internal server error, please try again later",
     "unknownError": "Unknown error",
-    "backHome": "Back to home",
-    "retry": "Retry",
     "configError": "API configuration error, please check the endpoint address",
     "duplicateRequest": "The current request is being processed, please do not repeat",
     "businessError": "Business processing failed: {msg}",
     "csrfError": "CSRF token verification failed, please refresh the page",
-    "emptyToken": "Login credentials are empty, please login again"
-  },
-  "form": {
-    "required": "This field is required",
-    "invalidEmail": "Please enter a valid email address",
-    "invalidPhone": "Please enter a valid phone number",
-    "passwordTooShort": "Password must be at least 6 characters",
-    "passwordMismatch": "Passwords do not match",
-    "selectOption": "Please select",
-    "inputPlaceholder": "Please enter",
-    "success": "Operation successful",
-    "failed": "Operation failed"
-  },
-  "layout": {
-    "header": "Header",
-    "footer": "Footer"
+    "emptyToken": "Login credentials are empty, please login again",
+    "tokenExpired": "登录状态已过期，请重新登录",
+    "tokenRefreshFailed": "Token刷新失败",
+    "requestError": "请求处理异常，请稍后重试"
   },
   "loading": {
     "global": "Loading...",
     "test": "test Loading..."
   },
-  "message": {
-    "success": "Success",
-    "error": "Error",
-    "warning": "Warning",
-    "info": "Info",
-    "confirmDelete": "Are you sure you want to delete?",
-    "confirmLogout": "Are you sure you want to logout?",
-    "operationSuccess": "Operation successful",
-    "operationFailed": "Operation failed",
-    "dataSaved": "Data saved successfully",
-    "dataDeleted": "Data deleted successfully"
+  "message": {},
+  "pages": {
+    "403": {
+      "noPermission": "没有权限"
+    },
+    "login": {
+      "login": "登录",
+      "username": "用户名",
+      "password": "密码"
+    },
+    "[...slug]": {
+      "noFound": "页面不存在"
+    }
   },
-  "nav": {
-    "home": "Home",
-    "dashboard": "Dashboard",
-    "user": "User Management",
-    "settings": "Settings",
-    "profile": "Profile",
-    "about": "About",
-    "help": "Help",
-    "admin": "Admin",
-    "finance": "Finance",
-    "hr": "Human Resources",
-    "technical": "Technical"
+  "layouts": {
+    "default": {
+      "header": "Header",
+      "footer": "Footer"
+    }
   },
-  "page": {
-    "login": "Login",
-    "about": "About",
-    "contact": "Contact Us",
-    "home": "Home",
-    "userCenter": "User Center",
-    "userCenterParent": "User Center (Parent Route)",
-    "backToUserHome": "Back to User Home",
-    "basicInfo": "Basic Info",
-    "advancedSettings": "Advanced Settings",
-    "childRouteContent": "Child route content will be rendered in this NuxtPage tag position",
-    "forbiddenAccess": "Forbidden Access - 403",
-    "noPermissionToAccess": "You do not have permission to access this page.",
-    "forbiddenAccess403": "403 Forbidden Access",
-    "noPermissionToView": "You do not have permission to view this content."
+  "site": {
+    "name": "科技有限公司",
+    "legalName": "科技有限公司",
+    "address": "省市区路号",
+    "city": "市",
+    "contactTitle": "联系我们 - 科技_400_地址/邮箱/在线咨询",
+    "contactDescription": "科技联系地址：省市区路号，欢迎来电洽谈合作。",
+    "contactKeywords": "科技,联系我们,400电话,企业地址",
+    "pageTitle": "首页 - 科技_专业产品生产厂家_解决方案提供商",
+    "headline": "标题",
+    "author": "作者",
+    "coreProductAlt": "核心产品 - 科技"
   },
-  "status": {
-    "active": "Active",
-    "inactive": "Inactive",
-    "pending": "Pending",
-    "processing": "Processing",
-    "completed": "Completed",
-    "failed": "Failed",
-    "success": "Success"
+  "components.test": {
+    "CustomUse": {
+      "title": "自定義測試 嵌套",
+      "test": {
+        "age": "年龄"
+      }
+    }
   },
-  "table": {
-    "noData": "No data available",
-    "total": "Total {total} items",
-    "selected": "{selected} items selected",
-    "actions": "Actions",
-    "sort": "Sort",
-    "filter": "Filter",
-    "columns": "Column Settings"
+  "pages.(auth)": {
+    "concat": {
+      "desc": "联系我们"
+    }
   },
-  "time": {
-    "today": "Today",
-    "yesterday": "Yesterday",
-    "thisWeek": "This week",
-    "lastWeek": "Last week",
-    "thisMonth": "This month",
-    "lastMonth": "Last month",
-    "thisYear": "This year",
-    "lastYear": "Last year"
+  "pages.(permission)": {
+    "user": {
+      "login": "登录",
+      "about": "关于",
+      "contact": "联系我们",
+      "home": "首页",
+      "userCenter": "用户中心",
+      "userCenterParent": "用户中心（父路由）",
+      "backToUserHome": "回到用户首页",
+      "basicInfo": "基础信息",
+      "advancedSettings": "高级设置",
+      "childRouteContent": "子路由内容会渲染在这个 NuxtPage 标签位置",
+      "forbiddenAccess": "禁止访问 - 403",
+      "noPermissionToAccess": "你没有权限访问该页面。",
+      "forbiddenAccess403": "403 禁止访问",
+      "noPermissionToView": "你没有权限查看该内容。"
+    }
   }
 };
