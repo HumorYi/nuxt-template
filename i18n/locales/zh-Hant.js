@@ -1,7 +1,4 @@
 export default {
-  "common": {
-    "backHome": "返回首页"
-  },
   "components": {
     "CustomTest": {
       "title": "自定义测试"
@@ -16,39 +13,33 @@ export default {
     }
   },
   "error": {
-    "networkError": "網路異常，請檢查網路連線",
-    "timeout": "請求逾時，請檢查網路後重試",
-    "serverError": "伺服器內部錯誤，請稍後重試",
-    "unknownError": "未知錯誤",
-    "configError": "API 設定異常，請檢查接口位址",
-    "duplicateRequest": "目前請求正在處理中，請勿重複操作",
-    "businessError": "業務處理失敗：{msg}",
-    "csrfError": "CSRF 驗證失敗，請重新整理頁面",
-    "emptyToken": "登入憑證為空，請重新登入",
+    "networkError": "网络异常，请检查网络连接",
+    "timeout": "请求超时，请检查网络后重试",
+    "serverError": "服务器内部错误，请稍后重试",
+    "unknownError": "未知错误",
+    "configError": "API 配置异常，请检查接口地址",
+    "duplicateRequest": "当前请求正在处理中，请勿重复操作",
+    "businessError": "业务处理失败：{msg}",
+    "csrfError": "CSRF 令牌验证失败，请刷新页面",
+    "emptyToken": "登录凭证为空，请重新登录",
     "tokenExpired": "登录状态已过期，请重新登录",
     "tokenRefreshFailed": "Token刷新失败",
     "requestError": "请求处理异常，请稍后重试"
   },
+  "layouts": {
+    "default": {
+      "header": "頭部",
+      "footer": "底部"
+    }
+  },
   "loading": {
-    "global": "載入中...",
-    "test": "test 載入中..."
+    "global": "載入中",
+    "test": "test 加载中"
   },
   "message": {},
   "pages": {
     "403": {
       "noPermission": "没有权限"
-    },
-    "login": {
-      "login": "登录",
-      "username": "用户名",
-      "password": "密码",
-      "message": {
-        "loginFailed": "登录失败",
-        "loginSuccess": "登录成功"
-      }
-    },
-    "[...slug]": {
-      "noFound": "页面不存在"
     },
     "(auth)": {
       "concat": {
@@ -72,12 +63,18 @@ export default {
         "forbiddenAccess403": "403 禁止访问",
         "noPermissionToView": "你没有权限查看该内容。"
       }
-    }
-  },
-  "layouts": {
-    "default": {
-      "header": "頭部",
-      "footer": "底部"
+    },
+    "[...slug]": {
+      "noFound": "页面不存在"
+    },
+    "login": {
+      "login": "登录",
+      "username": "用户名",
+      "password": "密码",
+      "message": {
+        "loginFailed": "登录失败",
+        "loginSuccess": "登录成功"
+      }
     }
   },
   "site": {

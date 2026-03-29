@@ -3,53 +3,27 @@ import path from 'node:path'
 import process from 'node:process'
 
 const rootDir = process.cwd()
-
 const localesDir = path.join(rootDir, 'i18n', 'locales')
+const translateDir = path.join(localesDir, 'translated')
+const needTranslateDir = path.join(localesDir, 'need-translate')
+
 const sourceFileName = 'zh.js'
 const sourceFile = path.join(localesDir, sourceFileName)
 
 // 读取 locales 目录下的所有 .js 文件，过滤掉 sourceFile 对应的文件
 const targetFiles = fs.readdirSync(localesDir, { withFileTypes: true })
   .filter(dirent => dirent.isFile() && dirent.name.endsWith('.js') && dirent.name !== sourceFileName)
-  .map(dirent => path.join(localesDir, dirent.name))
+  .map(dirent => ({
+    originFile: path.join(localesDir, dirent.name),
+    translatedFile: path.join(translateDir, dirent.name),
+    needTranslateFile: path.join(needTranslateDir, dirent.name),
+  }))
 
 const regExportDefault = /export default\s+(.*)/s
 const regSemicolonEnd = /;\s*$/
 
 function log(text) {
   console.log(`sync-locales.js: ${text}`)
-}
-
-/**
- * 多层JSON扁平化
- * @param {object} data - 嵌套的JSON对象
- * @param {string} [parentKey] - 递归父级键（内部使用）
- * @param {string} [separator] - 键分隔符
- * @returns {object} 扁平化后的单层对象
- */
-function flattenObject(data, parentKey = '', separator = '.') {
-  // 存储扁平化结果
-  const result = {}
-
-  // 遍历对象/数组的所有键值对
-  for (const [key, value] of Object.entries(data)) {
-    // 拼接当前完整键名
-    const currentKey = parentKey ? `${parentKey}${separator}${key}` : key
-
-    // 判断值是否为 嵌套对象（需要递归）
-    const isNested = typeof value === 'object' && value !== null
-
-    if (isNested) {
-      // 递归扁平化嵌套结构
-      Object.assign(result, flattenObject(value, currentKey, separator))
-    }
-    else {
-      // 基本类型（字符串/数字/布尔/null）直接赋值
-      result[currentKey] = value
-    }
-  }
-
-  return result
 }
 
 // 读取文件内容并解析为对象
@@ -74,6 +48,7 @@ function readFileContent(filePath) {
 function writeFileContent(filePath, content) {
   try {
     const fileContent = `export default ${JSON.stringify(content, null, 2)};`
+
     fs.writeFileSync(filePath, fileContent)
     log(`Updated file: ${filePath}`)
   }
@@ -82,85 +57,41 @@ function writeFileContent(filePath, content) {
   }
 }
 
-// 递归同步对象内容
-function syncObject(sourceObj, targetObj, fn, exist = false) {
-  Object.keys(sourceObj).forEach((key) => {
-    if (key in targetObj) {
-      if (typeof sourceObj[key] === 'object' && typeof targetObj[key] === 'object') {
-        syncObject(sourceObj[key], targetObj[key], fn)
+function syncObject(sourceData, translatedData, needTranslateData) {
+  for (const [k, v] of Object.entries(sourceData)) {
+    if (typeof v === 'string') {
+      if (translatedData[v]) {
+        sourceData[k] = translatedData[v]
       }
-      else if (exist) {
-        fn(sourceObj, targetObj, key)
+      else {
+        needTranslateData[v] = v
       }
-    }
-    else {
-      fn(sourceObj, targetObj, key)
-    }
-  })
-}
 
-function getExistVal(val, flatSourceData, flatTargetData) {
-  if (typeof val === 'string') {
-    const keys = []
-
-    for (const [k, v] of Object.entries(flatSourceData)) {
-      if (v === val) {
-        keys.push(k)
-      }
+      continue
     }
 
-    for (const k of keys) {
-      if (flatTargetData[k]) {
-        return flatTargetData[k]
-      }
+    if (typeof v === 'object') {
+      syncObject(v, translatedData, needTranslateData)
     }
   }
-  else if (typeof val === 'object') {
-    const result = JSON.parse(JSON.stringify(val))
-
-    for (const [k, v] of Object.entries(result)) {
-      result[k] = getExistVal(v, flatSourceData, flatTargetData)
-    }
-
-    return result
-  }
-
-  return val
 }
 
 // 同步单个目标文件
-function syncTargetFile(targetFile) {
-  const targetName = path.basename(targetFile)
+function syncTargetFile(sourceData, targetFile) {
+  const { originFile, translatedFile, needTranslateFile } = targetFile
+  const targetName = path.basename(originFile)
+
   log(`Syncing to ${targetName}...`)
 
-  // 构建完整的源数据对象
-  const sourceData = readFileContent(sourceFile)
+  const cloneSourceData = JSON.parse(JSON.stringify(sourceData))
+  const translatedData = readFileContent(translatedFile)
+  const needTranslateData = readFileContent(needTranslateFile)
 
-  // 同步内容：保持相同 key 的值，添加新 key，删除不存在的 key
-  const targetData = readFileContent(targetFile)
-  let isChanged = false
+  syncObject(cloneSourceData, translatedData, needTranslateData)
 
-  const flatSourceData = flattenObject(sourceData)
-  const flatTargetData = flattenObject(targetData)
-
-  // 增/改
-  syncObject(sourceData, targetData, (sourceObj, targetObj, key) => {
-    targetObj[key] = getExistVal(sourceObj[key], flatSourceData, flatTargetData)
-    console.log(`Add ${key}:`, targetObj[key])
-
-    isChanged = true
-  }, true)
-
-  // 删
-  syncObject(targetData, sourceData, (sourceObj, targetObj, key) => {
-    delete sourceObj[key]
-    isChanged = true
-  })
-
-  if (isChanged) {
-    // 写入同步后的内容
-    writeFileContent(targetFile, targetData)
-  }
+  // 写入同步后的内容
+  writeFileContent(originFile, cloneSourceData)
+  writeFileContent(needTranslateFile, needTranslateData)
 }
 
 // 开始同步
@@ -173,9 +104,11 @@ function startSync() {
     return
   }
 
+  const sourceData = readFileContent(sourceFile)
+
   // 同步到每个目标文件
   targetFiles.forEach((targetFile) => {
-    syncTargetFile(targetFile)
+    syncTargetFile(sourceData, targetFile)
   })
 
   log('Sync completed!')

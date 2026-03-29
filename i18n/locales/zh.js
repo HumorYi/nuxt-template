@@ -1,7 +1,4 @@
 export default {
-  "common": {
-    "backHome": "返回首页"
-  },
   "components": {
     "CustomTest": {
       "title": "自定义测试"
@@ -36,8 +33,8 @@ export default {
     }
   },
   "loading": {
-    "global": "加载中...",
-    "test": "test 加载中..."
+    "global": "加载中",
+    "test": "test 加载中"
   },
   "message": {},
   "pages": {
