@@ -4,11 +4,12 @@ import process from 'node:process'
 
 const rootDir = process.cwd()
 const localesDir = path.join(rootDir, 'i18n', 'locales')
+const customDir = path.join(rootDir, 'i18n', 'custom')
 
 // 监听目录及生成目标文件
 const configs = [
   {
-    watchDir: path.join(localesDir, 'zh'),
+    watchDir: path.join(customDir, 'zh'),
     targetFile: path.join(localesDir, 'zh.js'),
   },
 ]

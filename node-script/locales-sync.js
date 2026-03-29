@@ -4,8 +4,9 @@ import process from 'node:process'
 
 const rootDir = process.cwd()
 const localesDir = path.join(rootDir, 'i18n', 'locales')
-const translateDir = path.join(localesDir, 'translated')
-const needTranslateDir = path.join(localesDir, 'need-translate')
+const customDir = path.join(rootDir, 'i18n', 'custom')
+const translateDir = path.join(customDir, 'translated')
+const waitTranslateDir = path.join(customDir, 'wait-translate')
 
 const sourceFileName = 'zh.js'
 const sourceFile = path.join(localesDir, sourceFileName)
@@ -16,7 +17,7 @@ const targetFiles = fs.readdirSync(localesDir, { withFileTypes: true })
   .map(dirent => ({
     originFile: path.join(localesDir, dirent.name),
     translatedFile: path.join(translateDir, dirent.name),
-    needTranslateFile: path.join(needTranslateDir, dirent.name),
+    waitTranslateFile: path.join(waitTranslateDir, dirent.name),
   }))
 
 const regExportDefault = /export default\s+(.*)/s
@@ -29,6 +30,12 @@ function log(text) {
 // 读取文件内容并解析为对象
 function readFileContent(filePath) {
   try {
+    const isExists = fs.existsSync(filePath)
+
+    if (!isExists) {
+      writeFileContent(filePath)
+    }
+
     const fileContent = fs.readFileSync(filePath, 'utf8')
     const match = fileContent.match(regExportDefault)
     if (match && match[1]) {
@@ -45,7 +52,7 @@ function readFileContent(filePath) {
 }
 
 // 写入对象到文件
-function writeFileContent(filePath, content) {
+function writeFileContent(filePath, content = {}) {
   try {
     const fileContent = `export default ${JSON.stringify(content, null, 2)};`
 
@@ -57,41 +64,41 @@ function writeFileContent(filePath, content) {
   }
 }
 
-function syncObject(sourceData, translatedData, needTranslateData) {
+function syncObject(sourceData, translatedData, waitTranslateData) {
   for (const [k, v] of Object.entries(sourceData)) {
     if (typeof v === 'string') {
       if (translatedData[v]) {
         sourceData[k] = translatedData[v]
       }
       else {
-        needTranslateData[v] = v
+        waitTranslateData[v] = v
       }
 
       continue
     }
 
     if (typeof v === 'object') {
-      syncObject(v, translatedData, needTranslateData)
+      syncObject(v, translatedData, waitTranslateData)
     }
   }
 }
 
 // 同步单个目标文件
 function syncTargetFile(sourceData, targetFile) {
-  const { originFile, translatedFile, needTranslateFile } = targetFile
+  const { originFile, translatedFile, waitTranslateFile } = targetFile
   const targetName = path.basename(originFile)
 
   log(`Syncing to ${targetName}...`)
 
   const cloneSourceData = JSON.parse(JSON.stringify(sourceData))
   const translatedData = readFileContent(translatedFile)
-  const needTranslateData = readFileContent(needTranslateFile)
+  const waitTranslateData = readFileContent(waitTranslateFile)
 
-  syncObject(cloneSourceData, translatedData, needTranslateData)
+  syncObject(cloneSourceData, translatedData, waitTranslateData)
 
   // 写入同步后的内容
   writeFileContent(originFile, cloneSourceData)
-  writeFileContent(needTranslateFile, needTranslateData)
+  writeFileContent(waitTranslateFile, waitTranslateData)
 }
 
 // 开始同步

@@ -28,12 +28,12 @@ export default {
   },
   "layouts": {
     "default": {
-      "header": "header",
-      "footer": "footer"
+      "header": "头部",
+      "footer": "底部"
     }
   },
   "loading": {
-    "global": "Loading",
+    "global": "加载中",
     "test": "test 加载中"
   },
   "message": {},
