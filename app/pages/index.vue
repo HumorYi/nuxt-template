@@ -85,10 +85,12 @@ async function login() {
     await userStore.getUser()
   }
 }
+
 </script>
 
 <template>
   <div>
+
     <div>
       <button @click="login">
         login

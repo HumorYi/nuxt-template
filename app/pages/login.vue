@@ -28,17 +28,11 @@ async function login() {
 
 <template>
   <div>
-    <div>
-      <button @click="login">
-        {{ pageLang('login') }}
-      </button>
-    </div>
+    <button @click="login">
+      {{ pageLang('login') }}
+    </button>
 
-    <div class="m-10">
-      <NuxtLink to="/hr">
-        hr
-      </NuxtLink>
-    </div>
+    <div style=" width: 1000px;height: 1000px; background-color: red;" />
   </div>
 </template>
 

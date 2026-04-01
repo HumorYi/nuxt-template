@@ -1,4 +1,7 @@
 export default {
+  "common": {
+    "backHome": "返回首页"
+  },
   "components": {
     "CustomTest": {
       "title": "自定义测试"
@@ -28,7 +31,7 @@ export default {
   },
   "layouts": {
     "default": {
-      "header": "头部",
+      "header": "頭部",
       "footer": "底部"
     }
   },
@@ -42,7 +45,7 @@ export default {
       "noPermission": "没有权限"
     },
     "(auth)": {
-      "concat": {
+      "contact": {
         "desc": "联系我们"
       }
     },
@@ -89,5 +92,48 @@ export default {
     "headline": "标题",
     "author": "作者",
     "coreProductAlt": "核心产品 - 科技"
+  },
+  "ssg": {
+    "title": "靜態站點生成 (SSG)",
+    "contentTitle": "什麼是 SSG？",
+    "contentDescription": "靜態站點生成 (SSG) 是一種在構建時生成靜態 HTML 文件的技術，這些文件可以直接部署到任何靜態文件伺服器上。",
+    "benefit1": "快速的頁面載入速度",
+    "benefit2": "不需要伺服器即可提供服務",
+    "benefit3": "良好的 SEO 效能",
+    "generatedAt": "頁面生成時間: {time}",
+    "note": "此頁面在構建時靜態生成，後續訪問不會重新生成。"
+  },
+  "ssr": {
+    "title": "服務端渲染 (SSR)",
+    "contentTitle": "什麼是 SSR？",
+    "contentDescription": "服務端渲染 (SSR) 是一種在伺服器上為每個請求渲染頁面的技術，確保每次請求都能獲得最新的內容。",
+    "benefit1": "每個請求都能獲得動態內容",
+    "benefit2": "良好的 SEO 效能",
+    "benefit3": "每次頁面載入都能獲得最新數據",
+    "renderedAt": "頁面渲染時間: {time}",
+    "serverTime": "伺服器時間: {time}",
+    "note": "此頁面在伺服器上渲染，每次請求都會生成新的內容。"
+  },
+  "isr": {
+    "title": "增量靜態再生 (ISR)",
+    "contentTitle": "什麼是 ISR？",
+    "contentDescription": "增量靜態再生 (ISR) 是一種結合了 SSG 和 SSR 優點的技術，它在構建時生成靜態頁面，並在後台自動增量更新。",
+    "benefit1": "快速的初始載入時間",
+    "benefit2": "自動後台更新",
+    "benefit3": "減少伺服器負載",
+    "generatedAt": "頁面生成時間: {time}",
+    "dataUpdatedAt": "數據更新時間: {time}",
+    "note": "此頁面使用增量靜態再生 (ISR)，每 60 秒自動更新一次。"
+  },
+  "swr": {
+    "title": "Stale While Revalidate (SWR)",
+    "contentTitle": "什麼是 SWR？",
+    "contentDescription": "Stale While Revalidate (SWR) 是一種數據獲取模式，它首先返回緩存的舊數據（stale），然後在後台重新驗證並更新數據。",
+    "benefit1": "從緩存快速初始載入",
+    "benefit2": "後台數據重新驗證",
+    "benefit3": "無縫的用戶體驗",
+    "refresh": "刷新數據",
+    "lastUpdated": "最後更新時間: {time}",
+    "note": "此頁面使用 SWR 模式，當頁面獲得焦點或網路重新連接時會自動更新數據。"
   }
 };

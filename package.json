@@ -3,10 +3,10 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build --dotenv .env.production",
-    "dev": "nuxt dev --dotenv .env.development & node node-script/locales-watch.js",
-    "generate": "nuxt generate --dotenv .env.production",
-    "preview": "nuxt preview --dotenv .env.production",
+    "build": "nuxt build --dotenv .env.production.local",
+    "dev": "nuxt dev --dotenv .env.development.local & node node-script/locales-watch.js",
+    "generate": "nuxt generate --dotenv .env.production.local",
+    "preview": "nuxt preview --dotenv .env.production.local",
     "postinstall": "nuxt prepare",
     "lint:eslint": "eslint app --ext .js,.jsx,.ts,.tsx,.vue --fix",
     "lint:stylelint": "stylelint app/**/*.{css,less,scss,sass,vue,html} --fix"

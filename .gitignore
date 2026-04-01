@@ -54,6 +54,7 @@ temp/
 # .env
 # .env.*
 !.env.example   # 保留示例文件，供团队参考配置格式
+.env.*.local   # 本地环境变量文件（不提交）
 # 密钥/证书
 *.pem
 *.key

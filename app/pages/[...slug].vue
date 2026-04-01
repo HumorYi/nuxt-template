@@ -1,5 +1,5 @@
 <script setup>
-const pageLang = usePageLang('[...slug]')
+const pageLang = usePageLang('catchAllRoute')
 const commonLang = useCommonLang()
 </script>
 

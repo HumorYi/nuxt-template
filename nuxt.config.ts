@@ -7,7 +7,7 @@ import eslintPlugin from 'vite-plugin-eslint2'
 const isDev = process.env.NODE_ENV === 'development'
 const isProd = process.env.NODE_ENV === 'production'
 
-const defaultLocale = 'zh-Hans'
+const defaultLocale = 'zh'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -22,7 +22,7 @@ export default defineNuxtConfig({
   experimental: {},
 
   runtimeConfig: {
-    apiSecret: process.env.NUXT_API_SECRET,
+    apiSecret: process.env.API_SECRET,
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
       apiOtherBase: process.env.NUXT_PUBLIC_API_OTHER_BASE,
@@ -35,7 +35,7 @@ export default defineNuxtConfig({
       site: {
         url: process.env.NUXT_SITE_URL || '',
         logo: process.env.NUXT_SITE_LOGO || '',
-      }
+      },
     },
   },
 
@@ -82,9 +82,8 @@ export default defineNuxtConfig({
     plugins: [eslintPlugin()],
   },
 
-  ssr: true,
-
   app: {
+    pageTransition: false, // 缓存场景关闭过渡提升性能
     head: {
       htmlAttrs: { lang: 'zh-CN' },
       title: process.env.NUXT_SITE_NAME || '',
@@ -98,13 +97,14 @@ export default defineNuxtConfig({
     },
   },
 
+  ssr: true,
+
   nitro: {
     preset: 'node-server',
-    // preset: 'static',
     prerender: {
-      // routes: ['/'],
-      // ignore: ['/403', '/404'],
-      crawlLinks: true, // 自动爬取站内链接，补充预渲染路由
+      routes: ['/ssg-demo', '/login', '/about', '/403', '/404'],
+      ignore: [],
+      // crawlLinks: true,
     },
     compressPublicAssets: { brotli: true, gzip: true },
     devProxy: {
@@ -121,6 +121,17 @@ export default defineNuxtConfig({
         changeOrigin: true, // 关键：修改请求源
         prependPath: true, // 自动拼接路径
         target: process.env.NUXT_PUBLIC_API_OTHER_URL,
+      },
+    },
+    storage: {
+      redis: {
+        driver: 'redis',
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
+        password: process.env.REDIS_PASSWORD,
+        db: process.env.REDIS_DB,
+        keyPrefix: 'nuxt4:cache:', // 缓存键前缀，避免冲突
+        tls: process.env.REDIS_TLS === 'true', // 云厂商 Redis 一般开启 TLS
       },
     },
   },
@@ -158,7 +169,7 @@ export default defineNuxtConfig({
       { code: 'en', language: 'en-US', name: 'English', file: 'en.js' },
     ],
     vueI18n: './i18n/i18n.config.ts',
-    strategy: 'no_prefix',
+    strategy: 'prefix_except_default',
     detectBrowserLanguage: {
       fallbackLocale: defaultLocale,
     },
@@ -173,8 +184,8 @@ export default defineNuxtConfig({
   // 配置站点地图
   sitemap: {
     // 可选：排除不需要索引的路由
-    exclude: ['/403', '/404'],
-    zeroRuntime: true, // 核心：启用零运行时模式，适配静态路由场景
+    // exclude: ['/403', '/404'],
+    // zeroRuntime: true, // 核心：启用零运行时模式，适配静态路由场景
     // 优先级/更新频率
     defaults: {
       changefreq: 'daily', // 每天更新

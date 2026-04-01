@@ -21,7 +21,9 @@ const loadingStore = useLoadingStore()
       {{ loadingLang('test') }}
     </div>
 
-    <LanguageSwitcher />
+    <div class="lang">
+      <LanguageSwitcher />
+    </div>
 
     <NuxtLayout>
       <NuxtPage />
@@ -41,5 +43,11 @@ const loadingStore = useLoadingStore()
     color: white;
     background: rgb(0, 0, 0, 50%);
     user-select: none;
+  }
+
+  .lang {
+    position: fixed;
+    top: 10px;
+    right: 10px;
   }
 </style>

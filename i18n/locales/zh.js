@@ -1,96 +1,139 @@
 export default {
-  "common": {
-    "backHome": "返回首页"
+  common: {
+    backHome: '返回首页',
   },
-  "components": {
-    "CustomTest": {
-      "title": "自定义测试"
+  components: {
+    CustomTest: {
+      title: '自定义测试',
     },
-    "test": {
-      "CustomUse": {
-        "title": "自定義測試 嵌套",
-        "test": {
-          "age": "年龄"
-        }
-      }
-    }
-  },
-  "error": {
-    "networkError": "网络异常，请检查网络连接",
-    "timeout": "请求超时，请检查网络后重试",
-    "serverError": "服务器内部错误，请稍后重试",
-    "unknownError": "未知错误",
-    "configError": "API 配置异常，请检查接口地址",
-    "duplicateRequest": "当前请求正在处理中，请勿重复操作",
-    "businessError": "业务处理失败：{msg}",
-    "csrfError": "CSRF 令牌验证失败，请刷新页面",
-    "emptyToken": "登录凭证为空，请重新登录",
-    "tokenExpired": "登录状态已过期，请重新登录",
-    "tokenRefreshFailed": "Token刷新失败",
-    "requestError": "请求处理异常，请稍后重试"
-  },
-  "layouts": {
-    "default": {
-      "header": "头部",
-      "footer": "底部"
-    }
-  },
-  "loading": {
-    "global": "加载中...",
-    "test": "test 加载中..."
-  },
-  "message": {},
-  "pages": {
-    "403": {
-      "noPermission": "没有权限"
+    test: {
+      CustomUse: {
+        title: '自定義測試 嵌套',
+        test: {
+          age: '年龄',
+        },
+      },
     },
-    "(auth)": {
-      "concat": {
-        "desc": "联系我们"
-      }
-    },
-    "(permission)": {
-      "user": {
-        "login": "登录",
-        "about": "关于",
-        "contact": "联系我们",
-        "home": "首页",
-        "userCenter": "用户中心",
-        "userCenterParent": "用户中心（父路由）",
-        "backToUserHome": "回到用户首页",
-        "basicInfo": "基础信息",
-        "advancedSettings": "高级设置",
-        "childRouteContent": "子路由内容会渲染在这个 NuxtPage 标签位置",
-        "forbiddenAccess": "禁止访问 - 403",
-        "noPermissionToAccess": "你没有权限访问该页面。",
-        "forbiddenAccess403": "403 禁止访问",
-        "noPermissionToView": "你没有权限查看该内容。"
-      }
-    },
-    "[...slug]": {
-      "noFound": "页面不存在"
-    },
-    "login": {
-      "login": "登录",
-      "username": "用户名",
-      "password": "密码",
-      "message": {
-        "loginFailed": "登录失败",
-        "loginSuccess": "登录成功"
-      }
-    }
   },
-  "site": {
-    "name": "科技有限公司",
-    "legalName": "科技有限公司",
-    "address": "省市区路号",
-    "city": "市",
-    "contactTitle": "联系我们 - 科技_400_地址/邮箱/在线咨询",
-    "contactDescription": "科技联系地址：省市区路号，欢迎来电洽谈合作。",
-    "contactKeywords": "科技,联系我们,400电话,企业地址",
-    "pageTitle": "首页 - 科技_专业产品生产厂家_解决方案提供商",
-    "headline": "标题",
-    "author": "作者",
-    "coreProductAlt": "核心产品 - 科技"
-  }
-};
+  error: {
+    networkError: '网络异常，请检查网络连接',
+    timeout: '请求超时，请检查网络后重试',
+    serverError: '服务器内部错误，请稍后重试',
+    unknownError: '未知错误',
+    configError: 'API 配置异常，请检查接口地址',
+    duplicateRequest: '当前请求正在处理中，请勿重复操作',
+    businessError: '业务处理失败：{msg}',
+    csrfError: 'CSRF 令牌验证失败，请刷新页面',
+    emptyToken: '登录凭证为空，请重新登录',
+    tokenExpired: '登录状态已过期，请重新登录',
+    tokenRefreshFailed: 'Token刷新失败',
+    requestError: '请求处理异常，请稍后重试',
+  },
+  layouts: {
+    default: {
+      header: '头部',
+      footer: '底部',
+    },
+  },
+  loading: {
+    global: '加载中',
+    test: 'test 加载中',
+  },
+  message: {},
+  pages: {
+    '403': {
+      noPermission: '没有权限',
+    },
+    '(auth)': {
+      concat: {
+        desc: '联系我们',
+      },
+    },
+    '(permission)': {
+      user: {
+        login: '登录',
+        about: '关于',
+        contact: '联系我们',
+        home: '首页',
+        userCenter: '用户中心',
+        userCenterParent: '用户中心（父路由）',
+        backToUserHome: '回到用户首页',
+        basicInfo: '基础信息',
+        advancedSettings: '高级设置',
+        childRouteContent: '子路由内容会渲染在这个 NuxtPage 标签位置',
+        forbiddenAccess: '禁止访问 - 403',
+        noPermissionToAccess: '你没有权限访问该页面。',
+        forbiddenAccess403: '403 禁止访问',
+        noPermissionToView: '你没有权限查看该内容。',
+      },
+    },
+    'catchAllRoute': {
+      noFound: '页面不存在',
+    },
+    'login': {
+      login: '登录',
+      username: '用户名',
+      password: '密码',
+      message: {
+        loginFailed: '登录失败',
+        loginSuccess: '登录成功',
+      },
+    },
+  },
+  site: {
+    name: '科技有限公司',
+    legalName: '科技有限公司',
+    address: '省市区路号',
+    city: '市',
+    contactTitle: '联系我们 - 科技_400_地址/邮箱/在线咨询',
+    contactDescription: '科技联系地址：省市区路号，欢迎来电洽谈合作。',
+    contactKeywords: '科技,联系我们,400电话,企业地址',
+    pageTitle: '首页 - 科技_专业产品生产厂家_解决方案提供商',
+    headline: '标题',
+    author: '作者',
+    coreProductAlt: '核心产品 - 科技',
+  },
+  ssg: {
+    title: '静态站点生成 (SSG)',
+    contentTitle: '什么是 SSG？',
+    contentDescription: '静态站点生成 (SSG) 是一种在构建时生成静态 HTML 文件的技术，这些文件可以直接部署到任何静态文件服务器上。',
+    benefit1: '快速的页面加载速度',
+    benefit2: '不需要服务器即可提供服务',
+    benefit3: '良好的 SEO 性能',
+    generatedAt: '页面生成时间: {time}',
+    note: '此页面在构建时静态生成，后续访问不会重新生成。',
+  },
+  ssr: {
+    title: '服务端渲染 (SSR)',
+    contentTitle: '什么是 SSR？',
+    contentDescription: '服务端渲染 (SSR) 是一种在服务器上为每个请求渲染页面的技术，确保每次请求都能获得最新的内容。',
+    benefit1: '每个请求都能获得动态内容',
+    benefit2: '良好的 SEO 性能',
+    benefit3: '每次页面加载都能获得最新数据',
+    renderedAt: '页面渲染时间: {time}',
+    serverTime: '服务器时间: {time}',
+    note: '此页面在服务器上渲染，每次请求都会生成新的内容。',
+  },
+  isr: {
+    title: '增量静态再生 (ISR)',
+    contentTitle: '什么是 ISR？',
+    contentDescription: '增量静态再生 (ISR) 是一种结合了 SSG 和 SSR 优点的技术，它在构建时生成静态页面，并在后台自动增量更新。',
+    benefit1: '快速的初始加载时间',
+    benefit2: '自动后台更新',
+    benefit3: '减少服务器负载',
+    generatedAt: '页面生成时间: {time}',
+    dataUpdatedAt: '数据更新时间: {time}',
+    note: '此页面使用增量静态再生 (ISR)，每 60 秒自动更新一次。',
+  },
+  swr: {
+    title: 'Stale While Revalidate (SWR)',
+    contentTitle: '什么是 SWR？',
+    contentDescription: 'Stale While Revalidate (SWR) 是一种数据获取模式，它首先返回缓存的旧数据（stale），然后在后台重新验证并更新数据。',
+    benefit1: '从缓存快速初始加载',
+    benefit2: '后台数据重新验证',
+    benefit3: '无缝的用户体验',
+    refresh: '刷新数据',
+    lastUpdated: '最后更新时间: {time}',
+    note: '此页面使用 SWR 模式，当页面获得焦点或网络重新连接时会自动更新数据。',
+  },
+}
