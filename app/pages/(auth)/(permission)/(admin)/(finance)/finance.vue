@@ -1,10 +1,10 @@
 <script setup lang="ts">
-
+const pageLang = useFinancePageLang('finance')
 </script>
 
 <template>
   <div class="finance">
-    finance
+    {{ pageLang('title') }}
   </div>
 </template>
 

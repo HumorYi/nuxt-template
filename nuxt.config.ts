@@ -7,7 +7,8 @@ import eslintPlugin from 'vite-plugin-eslint2'
 const isDev = process.env.NODE_ENV === 'development'
 const isProd = process.env.NODE_ENV === 'production'
 
-const defaultLocale = 'zh'
+// 为什么不设置 zh，就算因为如果有繁体，没有对应的繁体翻译，也会使用简体
+const defaultLocale = 'zh-CN'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -53,29 +54,6 @@ export default defineNuxtConfig({
             @use "~/assets/styles/variables" as vars;
             @use "~/assets/styles/mixins" as mixins;
           `,
-        },
-      },
-    },
-    server: {
-      proxy: {
-        [process.env.NUXT_PUBLIC_API_BASE as string]: {
-          // secure: false, // https接口需配置
-          // ws: true, // 支持 websocket
-          changeOrigin: true,
-          target: process.env.NUXT_PUBLIC_API_URL,
-          rewrite: (path: string) =>
-            path.replace(new RegExp(`^${process.env.NUXT_PUBLIC_API_BASE}`), ''),
-        },
-        [process.env.NUXT_PUBLIC_API_OTHER_BASE as string]: {
-          // secure: false, // https接口需配置
-          // ws: true, // 支持 websocket
-          changeOrigin: true,
-          target: process.env.NUXT_PUBLIC_API_OTHER_URL,
-          rewrite: (path: string) =>
-            path.replace(
-              new RegExp(`^${process.env.NUXT_PUBLIC_API_OTHER_BASE}`),
-              '',
-            ),
         },
       },
     },
@@ -296,7 +274,7 @@ export default defineNuxtConfig({
             meta.middleware = ['permission', ...(meta.middleware || [])]
           }
 
-          if (isAuth || isPermission) {
+          if (isAuth) {
             meta.middleware = ['auth', ...(meta.middleware || [])]
           }
 

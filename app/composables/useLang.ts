@@ -10,7 +10,7 @@ export const usePageLang = (path: string) => useLang(`pages.${path}`)
 
 export const useAuthPageLang = (path: string) => usePageLang(`(auth).${path}`)
 
-export const usePermissionPageLang = (path: string) => usePageLang(`(permission).${path}`)
+export const usePermissionPageLang = (path: string) => useAuthPageLang(`(permission).${path}`)
 
 export const useLayoutLang = (path: string) => useLang(`layouts.${path}`)
 
@@ -27,5 +27,8 @@ export const useMessageLang = () => useLang(`message`)
 export const usePageMessageLang = (lang: Lang) => (path: string) => lang(`message.${path}`)
 
 // 业务相关提示文案 S
-export const useUserLang = () => useLang(`user`)
+export const useUserLang = () => usePermissionPageLang(`user`)
+
+export const useAdminPageLang = (path: string) => usePermissionPageLang(`(admin).${path}`)
+export const useFinancePageLang = (path: string) => useAdminPageLang(`(finance).${path}`)
 // 业务相关提示文案 E

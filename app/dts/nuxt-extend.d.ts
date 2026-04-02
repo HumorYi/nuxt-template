@@ -17,7 +17,7 @@ declare module 'nuxt/schema' {
 }
 
 declare module 'nuxt/app' {
-  type UseFetchOptions = FetchOptionsExtend
+  interface UseFetchOptions extends FetchOptionsExtend { }
 
   type NuxtApp = API
 }

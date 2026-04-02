@@ -36,7 +36,7 @@ export default {
     }
   },
   "loading": {
-    "global": "加载中",
+    "global": "Loading",
     "test": "test 加载中"
   },
   "message": {},
@@ -45,29 +45,39 @@ export default {
       "noPermission": "没有权限"
     },
     "(auth)": {
-      "contact": {
+      "(permission)": {
+        "(admin)": {
+          "(finance)": {
+            "finance": {
+              "title": "财务"
+            }
+          },
+          "admin": {
+            "admin": "管理员"
+          }
+        },
+        "user": {
+          "login": "登录",
+          "about": "关于",
+          "contact": "联系我们",
+          "home": "首页",
+          "userCenter": "用户中心",
+          "userCenterParent": "用户中心（父路由）",
+          "backToUserHome": "回到用户首页",
+          "basicInfo": "基础信息",
+          "advancedSettings": "高级设置",
+          "childRouteContent": "子路由内容会渲染在这个 NuxtPage 标签位置",
+          "forbiddenAccess": "禁止访问 - 403",
+          "noPermissionToAccess": "你没有权限访问该页面。",
+          "forbiddenAccess403": "403 禁止访问",
+          "noPermissionToView": "你没有权限查看该内容。"
+        }
+      },
+      "concat": {
         "desc": "联系我们"
       }
     },
-    "(permission)": {
-      "user": {
-        "login": "登录",
-        "about": "关于",
-        "contact": "联系我们",
-        "home": "首页",
-        "userCenter": "用户中心",
-        "userCenterParent": "用户中心（父路由）",
-        "backToUserHome": "回到用户首页",
-        "basicInfo": "基础信息",
-        "advancedSettings": "高级设置",
-        "childRouteContent": "子路由内容会渲染在这个 NuxtPage 标签位置",
-        "forbiddenAccess": "禁止访问 - 403",
-        "noPermissionToAccess": "你没有权限访问该页面。",
-        "forbiddenAccess403": "403 禁止访问",
-        "noPermissionToView": "你没有权限查看该内容。"
-      }
-    },
-    "[...slug]": {
+    "catchAllRoute": {
       "noFound": "页面不存在"
     },
     "login": {
@@ -92,48 +102,5 @@ export default {
     "headline": "标题",
     "author": "作者",
     "coreProductAlt": "核心产品 - 科技"
-  },
-  "ssg": {
-    "title": "Static Site Generation (SSG)",
-    "contentTitle": "What is SSG?",
-    "contentDescription": "Static Site Generation (SSG) is a technique that generates static HTML files at build time, which can be directly deployed to any static file server.",
-    "benefit1": "Fast page load times",
-    "benefit2": "No server required for serving",
-    "benefit3": "Good SEO performance",
-    "generatedAt": "Page generated at: {time}",
-    "note": "This page is statically generated at build time and won't be regenerated on subsequent visits."
-  },
-  "ssr": {
-    "title": "Server-Side Rendering (SSR)",
-    "contentTitle": "What is SSR?",
-    "contentDescription": "Server-Side Rendering (SSR) is a technique that renders pages on the server for each request, ensuring that each request gets the latest content.",
-    "benefit1": "Dynamic content for each request",
-    "benefit2": "Good SEO performance",
-    "benefit3": "Fresh data on every page load",
-    "renderedAt": "Page rendered at: {time}",
-    "serverTime": "Server time: {time}",
-    "note": "This page is rendered on the server and generates new content for each request."
-  },
-  "isr": {
-    "title": "Incremental Static Regeneration (ISR)",
-    "contentTitle": "What is ISR?",
-    "contentDescription": "Incremental Static Regeneration (ISR) is a technique that combines the benefits of SSG and SSR. It generates static pages at build time and automatically updates them incrementally in the background.",
-    "benefit1": "Fast initial load times",
-    "benefit2": "Automatic background updates",
-    "benefit3": "Reduced server load",
-    "generatedAt": "Page generated at: {time}",
-    "dataUpdatedAt": "Data updated at: {time}",
-    "note": "This page uses Incremental Static Regeneration (ISR) and updates automatically every 60 seconds."
-  },
-  "swr": {
-    "title": "Stale While Revalidate (SWR)",
-    "contentTitle": "What is SWR?",
-    "contentDescription": "Stale While Revalidate (SWR) is a data fetching pattern that first returns cached stale data and then revalidates and updates the data in the background.",
-    "benefit1": "Fast initial load from cache",
-    "benefit2": "Background data revalidation",
-    "benefit3": "Seamless user experience",
-    "refresh": "Refresh Data",
-    "lastUpdated": "Last updated: {time}",
-    "note": "This page uses the SWR pattern and automatically updates data when the page gains focus or the network reconnects."
   }
 };

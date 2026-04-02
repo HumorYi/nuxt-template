@@ -8,14 +8,14 @@ interface Option { preUrl?: string }
 
 function factory(apiBaseKey = 'apiBase', apiUrlKey = 'apiUrl') {
   function handle(method: HttpMethod = 'GET', option: Option = {}) {
-    return async <T>(url: NitroFetchRequest, options: UseFetchOptions<T> = {}) => {
+    return async <T = any>(url: NitroFetchRequest, options: UseFetchOptions<T> = {}) => {
       const runtimeConfig = useRuntimeConfig()
       const { $api } = useNuxtApp()
       const { componentKey } = useApiComponent()
 
       const { preUrl = '' } = option
 
-      const baseURL = runtimeConfig.public[import.meta.env.DEV ? apiBaseKey : apiUrlKey]
+      const baseURL = runtimeConfig.public[import.meta.env.DEV && import.meta.client ? apiBaseKey : apiUrlKey]
 
       const fullUrl = preUrl + url
 
@@ -31,15 +31,15 @@ function factory(apiBaseKey = 'apiBase', apiUrlKey = 'apiUrl') {
           : options.customRequest,
         method,
         $fetch: $api,
-      })
+      } as UseFetchOptions<T>)
     }
   }
 
-  return (optoin: Option = {}) => ({
-    get: handle('GET', optoin),
-    post: handle('POST', optoin),
-    put: handle('PUT', optoin),
-    del: handle('DELETE', optoin),
+  return (option: Option = {}) => ({
+    get: handle('GET', option),
+    post: handle('POST', option),
+    put: handle('PUT', option),
+    del: handle('DELETE', option),
   })
 }
 
