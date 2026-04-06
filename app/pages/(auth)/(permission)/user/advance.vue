@@ -1,23 +1,19 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const routes = [
+  { path: '/user/advance', text: 'home' },
+  { path: '/user/advance/base', text: 'base' },
+].filter(item => usePermission(item.path))
+</script>
 
 <template>
   <div class="advance">
     user advance
 
     <ul>
-      <li>
-        <nav>
-          <NuxtLinkPermission to="/user/advance">
-            home
-          </NuxtLinkPermission>
-        </nav>
-      </li>
-      <li>
-        <nav>
-          <NuxtLinkPermission to="/user/advance/base">
-            base
-          </NuxtLinkPermission>
-        </nav>
+      <li v-for="item in routes" :key="item.path">
+        <NuxtLink :to="item.path">
+          {{ item.text }}
+        </NuxtLink>
       </li>
     </ul>
 

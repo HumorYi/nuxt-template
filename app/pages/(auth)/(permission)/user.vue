@@ -2,6 +2,12 @@
 import { useUserLang } from '~/composables/useLang'
 
 const userLang = useUserLang()
+
+const routes = [
+  { path: '/user', text: userLang('backToUserHome') },
+  { path: '/user/base', text: userLang('basicInfo') },
+  { path: '/user/advance', text: userLang('advancedSettings') },
+].filter(item => usePermission(item.path))
 </script>
 
 <template>
@@ -10,20 +16,10 @@ const userLang = useUserLang()
 
     <!-- 子路由导航 -->
     <ul>
-      <li>
-        <NuxtLinkPermission to="/user">
-          {{ userLang('backToUserHome') }}
-        </NuxtLinkPermission>
-      </li>
-      <li>
-        <NuxtLinkPermission to="/user/base">
-          {{ userLang('basicInfo') }}
-        </NuxtLinkPermission>
-      </li>
-      <li>
-        <NuxtLinkPermission to="/user/advance">
-          {{ userLang('advancedSettings') }}
-        </NuxtLinkPermission>
+      <li v-for="item in routes" :key="item.path">
+        <NuxtLink :to="item.path">
+          {{ item.text }}
+        </NuxtLink>
       </li>
     </ul>
 

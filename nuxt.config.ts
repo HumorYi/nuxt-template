@@ -237,27 +237,27 @@ export default defineNuxtConfig({
   },
 
   hooks: {
-    'pages:extend': function (pages) {
-      const includeSuffixs = ['.vue']
-      const removeIndexs: number[] = []
+    'pages:extend': function (pages: NuxtPage[]) {
+      const includeSuffixList = ['.vue']
+      const removeIndexes: number[] = []
 
-      pages.forEach((page, index) => {
+      pages.forEach((page: NuxtPage, index: number) => {
         const filePath = page.file || ''
 
-        const isExcludeDir = filePath.includes(`_`)
-        const isInvalidSuffix = !includeSuffixs.some(suffix =>
+        const isExcludeDir = filePath.startsWith(`_`)
+        const isInvalidSuffix = !includeSuffixList.some(suffix =>
           filePath.endsWith(suffix),
         )
 
         if (isExcludeDir || isInvalidSuffix) {
-          removeIndexs.unshift(index)
+          removeIndexes.unshift(index)
         }
       })
 
-      removeIndexs.forEach(idx => pages.splice(idx, 1))
+      removeIndexes.forEach(idx => pages.splice(idx, 1))
     },
 
-    'pages:resolved': function (pages) {
+    'pages:resolved': function (pages: NuxtPage[]) {
       function setMiddleware(pages: NuxtPage[]) {
         if (!pages?.length)
           return

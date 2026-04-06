@@ -73,7 +73,7 @@ export default {
           "noPermissionToView": "你没有权限查看该内容。"
         }
       },
-      "concat": {
+      "contact": {
         "desc": "联系我们"
       }
     },
