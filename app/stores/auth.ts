@@ -1,10 +1,12 @@
 import type { RouteLocationNormalizedLoadedGeneric } from 'vue-router'
 import type { ApiResponse } from '~/types/api'
-import type { LoginRes } from '~/types/auth'
+import type { LoginBody, LoginRes } from '~/types/auth'
+import { login as loginApi } from '~/api/auth'
 
 export const useAuthStore = defineStore(
   'auth',
   () => {
+    const { getUser } = useUserStore()
     const cookieOption: Record<string, unknown> = {
       maxAge: 60 * 60 * 24 * 7, // 7 天有效期
       // 本地开发（HTTP）设为 false，生产（HTTPS）设为 true
@@ -98,6 +100,18 @@ export const useAuthStore = defineStore(
       )
     }
 
+    async function login(query: LoginBody) {
+      const res = await loginApi(query)
+
+      if (res?.success) {
+        setToken(res.data)
+
+        await getUser()
+
+        toLoginRedirect()
+      }
+    }
+
     return {
       accessToken,
       refreshToken,
@@ -107,7 +121,7 @@ export const useAuthStore = defineStore(
       clearToken,
       getRefreshToken,
       toLogin,
-      toLoginRedirect,
+      login,
     }
   },
   { persist: true },

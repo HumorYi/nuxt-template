@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const pageLang = useFinancePageLang('finance')
+const pageLang = useLangFinancePage('finance')
 </script>
 
 <template>

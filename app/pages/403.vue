@@ -1,6 +1,6 @@
 <script setup lang="ts">
-const pageLang = usePageLang('403')
-const commonLang = useCommonLang()
+const pageLang = useLangPage('403')
+const commonLang = useLangCommon()
 </script>
 
 <template>

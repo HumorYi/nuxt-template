@@ -15,46 +15,20 @@
 
 - 服务器端及客户端统一使用 useFetch，避免切换端时手动更改
 
-- app/composables/useApi 已基于 useFetch 做了一层扩展，暴露出通用方法 get、post、put、delete、patch、head、options
+- app/composables/useApi 已基于 useFetch 做了一层扩展，暴露出通用方法 get、post、put、del
 
 - app/api 存放所有 api 接口，按模块划分，使用示例：app/api/user.ts
 
   ```ts
   import type { ApiResponse } from '~/types/api'
+  import type { UserRes } from '~/types/user'
 
-  interface UserRoute {
-    path: string
-    children?: UserRoute[]
-  }
+  const { get } = useApi({ preUrl: '/user' })
 
-  interface UserRes {
-    id: number
-    name: string
-    routes: UserRoute[]
-    role?: string
-  }
+  export async function getUser() {
+    const res = await get('/base-info')
 
-  interface NoticeRes {
-    content: string
-  }
-
-  export function useUserApi() {
-    const { get } = useApi()
-    const { post: postOther } = useApiOther({ preUrl: '/user' }) // 统一模块前缀
-
-    async function getUser(query: { id: string }) {
-      const res = await get('/user', { query })
-
-      return res.data.value as ApiResponse<UserRes>
-    }
-
-    async function setNotice(body: { message: string }) {
-      const res = await postOther('/notice', { body })
-
-      return res.data.value as ApiResponse<NoticeRes>
-    }
-
-    return { getUser }
+    return res.data.value as ApiResponse<UserRes>
   }
   ```
 

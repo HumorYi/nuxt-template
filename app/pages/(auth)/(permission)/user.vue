@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useUserLang } from '~/composables/useLang'
+import { useLangUserPage } from '~/composables/useLang'
 
-const userLang = useUserLang()
+const userLang = useLangUserPage()
 
 const routes = [
   { path: '/user', text: userLang('backToUserHome') },

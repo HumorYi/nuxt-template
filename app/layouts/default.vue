@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const layoutLang = useLayoutLang('default')
+const layoutLang = useLangLayout('default')
 </script>
 
 <template>

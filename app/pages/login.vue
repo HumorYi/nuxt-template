@@ -1,28 +1,12 @@
 <script lang="ts" setup>
-const pageLang = usePageLang('login')
-const pageMessageLang = usePageMessageLang(pageLang)
-
-const authApi = useAuthApi()
+const pageLang = useLangPage('login')
 const authStore = useAuthStore()
-const userStore = useUserStore()
 
 async function login() {
-  const res = await authApi.login({
+  await authStore.login({
     username: 'username',
     password: 'password',
   })
-
-  const success = res?.success
-
-  if (success) {
-    authStore.setToken(res.data)
-
-    await userStore.getUser()
-
-    authStore.toLoginRedirect()
-  }
-
-  console.log(pageMessageLang(success ? 'loginSuccess' : 'loginFailed'))
 }
 </script>
 

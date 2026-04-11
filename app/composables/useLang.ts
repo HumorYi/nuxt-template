@@ -6,29 +6,29 @@ export function useLang(root: string) {
   return (path: string) => t(`${root}.${path}`)
 }
 
-export const usePageLang = (path: string) => useLang(`pages.${path}`)
+export const useLangPage = (path: string) => useLang(`pages.${path}`)
 
-export const useAuthPageLang = (path: string) => usePageLang(`(auth).${path}`)
+export const useLangAuthPage = (path: string) => useLangPage(`(auth).${path}`)
 
-export const usePermissionPageLang = (path: string) => useAuthPageLang(`(permission).${path}`)
+export const useLangAuthPermissionPage = (path: string) => useLangAuthPage(`(permission).${path}`)
 
-export const useLayoutLang = (path: string) => useLang(`layouts.${path}`)
+export const useLangLayout = (path: string) => useLang(`layouts.${path}`)
 
-export const useComponentLang = (path: string) => useLang(`components.${path}`)
+export const useLangComponent = (path: string) => useLang(`components.${path}`)
 
-export const useCommonLang = () => useLang(`common`)
+export const useLangCommon = () => useLang(`common`)
 
-export const useLoadingLang = () => useLang(`loading`)
+export const useLangLoading = () => useLang(`loading`)
 
-export const useSiteLang = () => useLang(`site`)
+export const useLangSite = () => useLang(`site`)
 
-export const useMessageLang = () => useLang(`message`)
+export const useLangMessage = () => useLang(`message`)
 
-export const usePageMessageLang = (lang: Lang) => (path: string) => lang(`message.${path}`)
+export const useLangPageMessage = (lang: Lang) => (path: string) => lang(`message.${path}`)
 
 // 业务相关提示文案 S
-export const useUserLang = () => usePermissionPageLang(`user`)
+export const useLangUserPage = () => useLangAuthPermissionPage(`user`)
 
-export const useAdminPageLang = (path: string) => usePermissionPageLang(`(admin).${path}`)
-export const useFinancePageLang = (path: string) => useAdminPageLang(`(finance).${path}`)
+export const useLangAdminPage = (path: string) => useLangAuthPermissionPage(`(admin).${path}`)
+export const useLangFinancePage = (path: string) => useLangAdminPage(`(finance).${path}`)
 // 业务相关提示文案 E

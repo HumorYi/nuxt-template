@@ -1,6 +1,4 @@
 import { mergeConfigs } from '@unocss/core'
-import config from './.nuxt/uno.config.mjs'
-
 /**
  * 样式规则互动工具
  *    https://unocss.dev/interactive/
@@ -9,19 +7,20 @@ import config from './.nuxt/uno.config.mjs'
  *    http://localhost:8080/__unocss#/
  */
 import presetRemToPx from '@unocss/preset-rem-to-px'
+
 import {
-  defineConfig,
   presetAttributify,
   presetIcons,
   presetTypography,
   presetWebFonts,
   presetWind3,
   transformerDirectives,
-  transformerVariantGroup
+  transformerVariantGroup,
 } from 'unocss'
+import config from './.nuxt/uno.config.mjs'
 
-// import customPresets from './uno/presets'
-// import customShortcuts from './uno/shortcuts'
+import customPresets from './uno/presets'
+import customShortcuts from './uno/shortcuts'
 
 export default mergeConfigs([
   config,
@@ -32,17 +31,17 @@ export default mergeConfigs([
           // the default
           /\.(vue|svelte|[jt]sx|mdx?|astro|elm|php|phtml|html)($|\?)/,
           // include js/ts files
-          'app/**/*.{js,ts}'
-        ]
+          'app/**/*.{js,ts}',
+        ],
         // exclude files
         // exclude: []
-      }
+      },
     },
     shortcuts: {
-      // ...customShortcuts
+      ...customShortcuts,
     },
     theme: {
-      colors: {}
+      colors: {},
     },
     presets: [
       presetWind3(),
@@ -52,11 +51,11 @@ export default mergeConfigs([
       presetWebFonts({
         fonts: {
           // ...
-        }
+        },
       }),
-      presetRemToPx({ baseFontSize: 4 })
-      // ...customPresets
+      presetRemToPx({ baseFontSize: 4 }),
+      ...customPresets,
     ],
-    transformers: [transformerDirectives(), transformerVariantGroup()]
-  }
+    transformers: [transformerDirectives(), transformerVariantGroup()],
+  },
 ])

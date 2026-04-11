@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const pageLang = useAdminPageLang('admin')
+const pageLang = useLangAdminPage('admin')
 </script>
 
 <template>

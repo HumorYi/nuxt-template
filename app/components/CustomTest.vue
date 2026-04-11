@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const componentLang = useComponentLang('CustomTest')
+const componentLang = useLangComponent('CustomTest')
 </script>
 
 <template>

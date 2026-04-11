@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useLoadingLang } from './composables/useLang'
+import { useLangLoading } from './composables/useLang'
 
-const loadingLang = useLoadingLang()
+const loadingLang = useLangLoading()
 const loadingStore = useLoadingStore()
 </script>
 

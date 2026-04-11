@@ -5,17 +5,16 @@ import type {
 } from 'vue-router'
 
 import type { UserRes, UserRoute } from '~/types/user'
-import { useUserApi } from '~/api/user'
+import { getUser as getUserApi } from '~/api/user'
 
 export const useUserStore = defineStore('user', () => {
-  const userApi = useUserApi()
   const user = ref<UserRes | null>(null)
   // 权限校验用：把接口返回的 `routes` 预先扁平化为 fullPath Set
   // 避免每次导航都递归拼接路径，提升 permission middleware 性能。
   const userRoutesFullPathSet = ref<Set<string>>(new Set())
 
   async function getUser() {
-    const res = await userApi.getUser()
+    const res = await getUserApi()
 
     if (res?.success) {
       user.value = res.data

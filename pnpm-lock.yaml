@@ -57,6 +57,9 @@ importers:
       '@unocss/reset':
         specifier: ^66.6.7
         version: 66.6.7
+      chokidar:
+        specifier: ^5.0.0
+        version: 5.0.0
       eslint:
         specifier: ^9.39.4
         version: 9.39.4(jiti@2.6.1)

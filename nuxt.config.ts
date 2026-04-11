@@ -1,21 +1,40 @@
 import type { NuxtPage } from 'nuxt/schema'
 import type { ApiPluginConfig } from './app/types/api'
-import process from 'node:process'
-
+import fs from 'node:fs'
+import { resolve } from 'node:path'
+import { env } from 'node:process'
 import eslintPlugin from 'vite-plugin-eslint2'
 
-const isDev = process.env.NODE_ENV === 'development'
-const isProd = process.env.NODE_ENV === 'production'
+const isDev = env.NODE_ENV === 'development'
+const isProd = env.NODE_ENV === 'production'
 
 // 为什么不设置 zh，就算因为如果有繁体，没有对应的繁体翻译，也会使用简体
 const defaultLocale = 'zh-CN'
+
+function getFiles(dir: string): string[] {
+  const files: string[] = []
+  const items = fs.readdirSync(dir, { withFileTypes: true })
+
+  for (const item of items) {
+    const fullPath = resolve(dir, item.name)
+
+    if (item.isDirectory()) {
+      files.push(...getFiles(fullPath))
+    }
+    else {
+      files.push(fullPath)
+    }
+  }
+
+  return files
+}
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
   imports: {
-    dirs: ['api'],
+    dirs: ['stores'],
   },
 
   sourcemap: isProd,
@@ -23,19 +42,19 @@ export default defineNuxtConfig({
   experimental: {},
 
   runtimeConfig: {
-    apiSecret: process.env.API_SECRET,
+    apiSecret: env.API_SECRET,
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE,
-      apiOtherBase: process.env.NUXT_PUBLIC_API_OTHER_BASE,
-      apiUrl: process.env.NUXT_PUBLIC_API_URL,
-      apiOtherUrl: process.env.NUXT_PUBLIC_API_OTHER_URL,
+      apiBase: env.NUXT_PUBLIC_API_BASE,
+      apiOtherBase: env.NUXT_PUBLIC_API_OTHER_BASE,
+      apiUrl: env.NUXT_PUBLIC_API_URL,
+      apiOtherUrl: env.NUXT_PUBLIC_API_OTHER_URL,
       apiPlugin: {
         // customLoading: { enable: true, key: 'global' },
         // timeout: 1 * 1000
       } as ApiPluginConfig,
       site: {
-        url: process.env.NUXT_SITE_URL || '',
-        logo: process.env.NUXT_SITE_LOGO || '',
+        url: env.NUXT_SITE_URL || '',
+        logo: env.NUXT_SITE_LOGO || '',
       },
     },
   },
@@ -64,10 +83,10 @@ export default defineNuxtConfig({
     pageTransition: false, // 缓存场景关闭过渡提升性能
     head: {
       htmlAttrs: { lang: 'zh-CN' },
-      title: process.env.NUXT_SITE_NAME || '',
+      title: env.NUXT_SITE_NAME || '',
       link: [
         { rel: 'icon', href: '/favicon.ico' },
-        { rel: 'canonical', href: process.env.NUXT_SITE_URL || '' },
+        { rel: 'canonical', href: env.NUXT_SITE_URL || '' },
         // 通用外部样式表 S
         // { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css' }
         // 通用外部样式表 E
@@ -86,30 +105,30 @@ export default defineNuxtConfig({
     },
     compressPublicAssets: { brotli: true, gzip: true },
     devProxy: {
-      [process.env.NUXT_PUBLIC_API_BASE as string]: {
+      [env.NUXT_PUBLIC_API_BASE as string]: {
         // secure: false, // https接口需配置
         // ws: true, // 支持 websocket
         changeOrigin: true, // 关键：修改请求源
         prependPath: true, // 自动拼接路径
-        target: process.env.NUXT_PUBLIC_API_URL,
+        target: env.NUXT_PUBLIC_API_URL,
       },
-      [process.env.NUXT_PUBLIC_API_OTHER_BASE as string]: {
+      [env.NUXT_PUBLIC_API_OTHER_BASE as string]: {
         // secure: false, // https接口需配置
         // ws: true, // 支持 websocket
         changeOrigin: true, // 关键：修改请求源
         prependPath: true, // 自动拼接路径
-        target: process.env.NUXT_PUBLIC_API_OTHER_URL,
+        target: env.NUXT_PUBLIC_API_OTHER_URL,
       },
     },
     storage: {
       redis: {
         driver: 'redis',
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
-        password: process.env.REDIS_PASSWORD,
-        db: process.env.REDIS_DB,
+        host: env.REDIS_HOST,
+        port: env.REDIS_PORT,
+        password: env.REDIS_PASSWORD,
+        db: env.REDIS_DB,
         keyPrefix: 'nuxt4:cache:', // 缓存键前缀，避免冲突
-        tls: process.env.REDIS_TLS === 'true', // 云厂商 Redis 一般开启 TLS
+        tls: env.REDIS_TLS === 'true', // 云厂商 Redis 一般开启 TLS
       },
     },
   },
@@ -139,7 +158,7 @@ export default defineNuxtConfig({
   },
 
   i18n: {
-    baseUrl: process.env.NUXT_SITE_URL,
+    baseUrl: env.NUXT_SITE_URL,
     defaultLocale,
     locales: [
       { code: defaultLocale, language: 'zh-Hans', name: '简体中文', file: 'zh.js' },
@@ -154,9 +173,9 @@ export default defineNuxtConfig({
   },
 
   site: {
-    url: process.env.NUXT_SITE_URL,
-    name: process.env.NUXT_SITE_NAME,
-    description: process.env.NUXT_SITE_DESCRIPTION,
+    url: env.NUXT_SITE_URL,
+    name: env.NUXT_SITE_NAME,
+    description: env.NUXT_SITE_DESCRIPTION,
   },
 
   // 配置站点地图
@@ -182,7 +201,7 @@ export default defineNuxtConfig({
   schemaOrg: {
     identity: {
       type: 'Organization',
-      name: process.env.NUXT_SITE_NAME || '',
+      name: env.NUXT_SITE_NAME || '',
       logo: '/logo.png',
       sameAs: ['https://twitter.com/mycompany'],
     },
@@ -201,7 +220,7 @@ export default defineNuxtConfig({
     debug: true,
     meta: {
       // Basic SEO
-      description: process.env.NUXT_SITE_DESCRIPTION,
+      description: env.NUXT_SITE_DESCRIPTION,
       author: 'humoryi',
 
       // Theme & Color
@@ -216,13 +235,13 @@ export default defineNuxtConfig({
       twitterSite: '@mysite',
 
       // App Info
-      applicationName: process.env.NUXT_SITE_NAME || '',
+      applicationName: env.NUXT_SITE_NAME || '',
 
       // Nuxt SEO Utils already sets the below tags for you
-      ogSiteName: process.env.NUXT_SITE_NAME || '',
+      ogSiteName: env.NUXT_SITE_NAME || '',
       ogType: 'website',
-      ogUrl: process.env.NUXT_SITE_URL || '',
-      ogTitle: process.env.NUXT_SITE_NAME || '',
+      ogUrl: env.NUXT_SITE_URL || '',
+      ogTitle: env.NUXT_SITE_NAME || '',
 
       // Other Nuxt SEO modules handle these
       ogImage: 'https://example.com/my-og-image.png',
@@ -245,16 +264,14 @@ export default defineNuxtConfig({
         const filePath = page.file || ''
 
         const isExcludeDir = filePath.startsWith(`_`)
-        const isInvalidSuffix = !includeSuffixList.some(suffix =>
-          filePath.endsWith(suffix),
-        )
+        const isInvalidSuffix = !includeSuffixList.some(suffix => filePath.endsWith(suffix))
 
         if (isExcludeDir || isInvalidSuffix) {
-          removeIndexes.unshift(index)
+          removeIndexes.push(index)
         }
       })
 
-      removeIndexes.forEach(idx => pages.splice(idx, 1))
+      removeIndexes.sort((a, b) => b - a).forEach(idx => pages.splice(idx, 1))
     },
 
     'pages:resolved': function (pages: NuxtPage[]) {
@@ -285,5 +302,24 @@ export default defineNuxtConfig({
 
       setMiddleware(pages)
     },
+
+    'imports:dirs': (dirs: string[]) => {
+      const excludes = ['app/utils']
+      const removeIndexes: number[] = []
+
+      excludes.forEach((exclude) => {
+        const idx = dirs.findIndex(dir => dir.includes(exclude))
+
+        if (idx !== -1) {
+          removeIndexes.push(idx)
+        }
+      })
+
+      removeIndexes.sort((a, b) => b - a).forEach(idx => dirs.splice(idx, 1))
+    },
   },
+
+  watch: [
+    ...getFiles('uno'),
+  ],
 })

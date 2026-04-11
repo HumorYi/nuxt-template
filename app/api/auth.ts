@@ -1,24 +1,14 @@
 import type { ApiResponse } from '~/types/api'
+import type { LoginBody, LoginRes } from '~/types/auth'
+import { getPreUrl } from '~/utils/api'
 
-import type { LoginRes } from '~/types/auth'
+const { post } = useApi({ preUrl: getPreUrl(import.meta.url) })
 
-interface LoginBody {
-  username: string
-  password: string
-}
+export async function login(body: LoginBody) {
+  const res = await post('/login', {
+    body,
+    // customLoading: { key: 'test' }
+  })
 
-export function useAuthApi() {
-  const { get } = useApi()
-
-  async function login(query: LoginBody) {
-    const res = await get('/login', {
-      query,
-
-      // customLoading: { key: 'test' }
-    })
-
-    return res.data.value as ApiResponse<LoginRes>
-  }
-
-  return { login }
+  return res.data.value as ApiResponse<LoginRes>
 }

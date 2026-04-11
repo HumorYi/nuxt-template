@@ -1,6 +1,6 @@
 <script setup>
-const pageLang = usePageLang('catchAllRoute')
-const commonLang = useCommonLang()
+const pageLang = useLangPage('catchAllRoute')
+const commonLang = useLangCommon()
 </script>
 
 <template>
