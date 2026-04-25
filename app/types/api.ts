@@ -96,7 +96,7 @@ export interface CustomRequestConfig {
   /** 超时参数写在此处，而不是 useFetch 默认位置，默认请求超时时间（毫秒），默认 10 * 1000（10 秒） */
   timeout?: number
   /** 是否携带令牌（Authorization 头），默认 true */
-  withToken?: boolean
+  token?: boolean
   /** 是否序列化表单数据（如 application/x-www-form-urlencoded），默认 true */
   serializeForm?: boolean
 

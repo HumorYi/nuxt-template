@@ -4,14 +4,21 @@ import type {
   RouteRecordNormalized,
 } from 'vue-router'
 
+import type { FEATURE_TYPE } from '~/types/permission'
 import type { UserRes, UserRoute } from '~/types/user'
 import { getUser as getUserApi } from '~/api/user'
+import PERMISSION_FEATURE from '~/config/permission-feature'
 
 export const useUserStore = defineStore('user', () => {
   const user = ref<UserRes | null>(null)
   // 权限校验用：把接口返回的 `routes` 预先扁平化为 fullPath Set
   // 避免每次导航都递归拼接路径，提升 permission middleware 性能。
   const userRoutesFullPathSet = ref<Set<string>>(new Set())
+
+  function clear() {
+    user.value = null
+    userRoutesFullPathSet.value = new Set()
+  }
 
   async function getUser() {
     const res = await getUserApi()
@@ -33,7 +40,7 @@ export const useUserStore = defineStore('user', () => {
   const isLogin = computed(() => !!user.value)
 
   // 路由权限验证，客户端可能通过 路由地址 或 路由名称来判断权限，通过路由表找到对应路由记录，取记录中的分组信息做判断
-  function hasRoutePermission(to: RouteLocationRaw) {
+  function hasPermissionPage(to: RouteLocationRaw) {
     const router = useRouter()
     const routes = router.getRoutes()
     let targetRoute: RouteRecordNormalized | undefined
@@ -52,46 +59,56 @@ export const useUserStore = defineStore('user', () => {
       )
     }
 
-    if (!targetRoute)
+    if (!targetRoute) {
       return false
-
-    const resolvedRoute = router.resolve(targetRoute.path)
-
-    return hasMiddlewareRoutePermission(
-      resolvedRoute as RouteLocationNormalizedGeneric,
-    )
-  }
-
-  // 路由中间件直接能拿到路由记录，取记录中的分组信息做判断
-  function hasMiddlewareRoutePermission(to: RouteLocationNormalizedGeneric) {
-    if (!isLogin.value)
-      return false
-
-    if (user.value?.role) {
-      return hasRoleRoutePermission(to, user.value?.role)
     }
 
-    if (user.value?.routes) {
-      return hasDynamicRoutePermission(to)
+    return hasMiddlewarePermission(router.resolve(targetRoute.path) as RouteLocationNormalizedGeneric)
+  }
+
+  function hasMiddlewarePermission(to: RouteLocationNormalizedGeneric) {
+    if (!user.value) {
+      return false
+    }
+
+    if (user.value.role) {
+      const lastGroups: string[] = []
+
+      to.meta.groups?.forEach(group => lastGroups.push(...group.split('_')))
+
+      if (lastGroups.length) {
+        return lastGroups.includes(user.value.role)
+      }
+    }
+    else if (user.value.routes?.length) {
+      return userRoutesFullPathSet.value.has(to.fullPath)
     }
 
     return true
   }
 
-  function hasRoleRoutePermission(
-    to: RouteLocationNormalizedGeneric,
-    role: string,
-  ) {
-    const { groups = [] } = to.meta
-    const lastGroups: string[] = []
+  function hasPermissionFeature(name: string, type: FEATURE_TYPE) {
+    if (!user.value) {
+      return false
+    }
 
-    groups.forEach(group => lastGroups.push(...group.split('_')))
+    if (user.value.role) {
+      const result = PERMISSION_FEATURE[name]?.[type]
 
-    return lastGroups.includes(role)
-  }
+      if (result?.length) {
+        return result.includes(user.value.role)
+      }
+    }
 
-  function hasDynamicRoutePermission(to: RouteLocationNormalizedGeneric) {
-    return userRoutesFullPathSet.value.has(to.fullPath)
+    if (user.value.feature) {
+      const result = user.value.feature[name]?.[type]
+
+      if (typeof result === 'boolean') {
+        return result
+      }
+    }
+
+    return true
   }
 
   function getRoutesFullPath(
@@ -118,9 +135,11 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     user,
+    clear,
     getUser,
     isLogin,
-    hasRoutePermission,
-    hasMiddlewareRoutePermission,
+    hasPermissionPage,
+    hasMiddlewarePermission,
+    hasPermissionFeature,
   }
 })

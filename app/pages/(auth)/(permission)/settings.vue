@@ -3,7 +3,7 @@ const routes = [
   { path: '/settings', text: 'home' },
   { path: '/settings/base', text: 'base' },
   { path: '/settings/advance', text: 'advance' },
-].filter(item => usePermission(item.path))
+].filter(item => usePermissionPage(item.path))
 </script>
 
 <template>

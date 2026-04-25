@@ -99,7 +99,7 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'node-server',
     prerender: {
-      routes: ['/ssg-demo', '/login', '/about', '/403', '/404'],
+      routes: ['/ssg-demo', '/login', '/about', '/forbidden', '/404'],
       ignore: [],
       // crawlLinks: true,
     },
@@ -181,7 +181,7 @@ export default defineNuxtConfig({
   // 配置站点地图
   sitemap: {
     // 可选：排除不需要索引的路由
-    // exclude: ['/403', '/404'],
+    // exclude: ['/forbidden', '/404'],
     // zeroRuntime: true, // 核心：启用零运行时模式，适配静态路由场景
     // 优先级/更新频率
     defaults: {
@@ -196,7 +196,9 @@ export default defineNuxtConfig({
     groups: [{ userAgent: ['GPTBot', 'ChatGPT-User'], disallow: ['/'] }],
   },
 
-  ogImage: {},
+  ogImage: {
+    zeroRuntime: true,
+  },
 
   schemaOrg: {
     identity: {

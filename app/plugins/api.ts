@@ -51,7 +51,7 @@ const customRetryConfig: CustomRetryConfig = {
  */
 const customRequestConfig: CustomRequestConfig = {
   timeout: 10 * 1000,
-  withToken: true,
+  token: true,
   serializeForm: true,
   abortKeyPrefix: 'api_abort_',
   headers: {
@@ -741,7 +741,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         this.waiters = []
         waiters.forEach(w => w.reject(error))
 
-        authStore.clearToken()
+        authStore.clear()
         if (import.meta.client) {
           await nuxtApp.runWithContext(() => authStore.toLogin())
         }
@@ -793,7 +793,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     try {
       // 如果正在刷新token，等待结果
-      if (tokenRefreshManager.isRefreshing && lastCustomRequestConfig.withToken) {
+      if (tokenRefreshManager.isRefreshing && lastCustomRequestConfig.token) {
         const refreshSuccess = await tokenRefreshManager.waitForRefresh()
         if (!refreshSuccess) {
           throw new Error('tokenRefreshFailed')
@@ -903,7 +903,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         normalizedHeaders[lastHeaders.csrfToken] = csrfToken
       }
       // 添加认证Token
-      if (token && lastCustomRequestConfig.withToken && lastHeaders.token) {
+      if (token && lastCustomRequestConfig.token && lastHeaders.token) {
         normalizedHeaders[lastHeaders.token] = `Bearer ${token}`
       }
 

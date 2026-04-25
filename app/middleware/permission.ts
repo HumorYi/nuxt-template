@@ -1,7 +1,7 @@
 export default defineNuxtRouteMiddleware((to) => {
-  const targetPath = '/403'
+  const targetPath = '/forbidden'
 
-  if (!usePermission(to) && to.path !== targetPath) {
+  if (!useUserStore().hasMiddlewarePermission(to) && to.path !== targetPath) {
     return navigateTo(targetPath)
   }
 })

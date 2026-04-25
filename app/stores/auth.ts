@@ -1,12 +1,11 @@
 import type { RouteLocationNormalizedLoadedGeneric } from 'vue-router'
-import type { ApiResponse } from '~/types/api'
 import type { LoginBody, LoginRes } from '~/types/auth'
-import { login as loginApi } from '~/api/auth'
+import { login as loginApi, logout as logoutApi, refreshToken as refreshTokenApi } from '~/api/auth'
 
 export const useAuthStore = defineStore(
   'auth',
   () => {
-    const { getUser } = useUserStore()
+    const { getUser, clear: clearUser } = useUserStore()
     const cookieOption: Record<string, unknown> = {
       maxAge: 60 * 60 * 24 * 7, // 7 天有效期
       // 本地开发（HTTP）设为 false，生产（HTTPS）设为 true
@@ -22,11 +21,21 @@ export const useAuthStore = defineStore(
     const refreshTokenCookie = useCookie('refreshToken', cookieOption)
     const accessToken = ref('')
     const refreshToken = ref('')
-    const runtimeConfig = useRuntimeConfig()
+
+    function clear() {
+      accessToken.value = ''
+      refreshToken.value = ''
+
+      accessTokenCookie.value = null
+      refreshTokenCookie.value = null
+
+      clearUser()
+    }
 
     function initToken() {
-      if (accessToken.value)
+      if (accessToken.value) {
         return
+      }
 
       accessToken.value = accessTokenCookie.value || ''
       refreshToken.value = refreshTokenCookie.value || ''
@@ -42,17 +51,10 @@ export const useAuthStore = defineStore(
         : refreshTokenCookie.value
 
       if (val) {
-        // 调用 Token 刷新接口
-        const response = await $fetch<ApiResponse<LoginRes>>('/refresh-token', {
-          baseURL: import.meta.env.DEV
-            ? runtimeConfig.public.apiBase
-            : runtimeConfig.public.apiUrl,
-          headers: { 'X-Refresh-Token': val },
-          method: 'POST',
-        })
+        const res = await refreshTokenApi(val)
 
-        if (response.success) {
-          setToken(response.data)
+        if (res.success) {
+          setToken(res.data)
 
           return accessToken.value
         }
@@ -65,14 +67,6 @@ export const useAuthStore = defineStore(
 
       accessTokenCookie.value = accessToken.value
       refreshTokenCookie.value = refreshToken.value
-    }
-
-    function clearToken() {
-      accessToken.value = ''
-      refreshToken.value = ''
-
-      accessTokenCookie.value = null
-      refreshTokenCookie.value = null
     }
 
     function toLogin(to?: RouteLocationNormalizedLoadedGeneric) {
@@ -88,18 +82,6 @@ export const useAuthStore = defineStore(
       }
     }
 
-    function toLoginRedirect() {
-      const { query } = useRoute()
-
-      navigateTo(
-        {
-          path: query.redirect as string || '/',
-          query: { ...query, redirect: undefined },
-        },
-        { replace: true },
-      )
-    }
-
     async function login(query: LoginBody) {
       const res = await loginApi(query)
 
@@ -108,8 +90,22 @@ export const useAuthStore = defineStore(
 
         await getUser()
 
-        toLoginRedirect()
+        const { query } = useRoute()
+
+        navigateTo(
+          {
+            path: query.redirect as string || '/',
+            query: { ...query, redirect: undefined },
+          },
+          { replace: true },
+        )
       }
+    }
+
+    async function logout() {
+      await logoutApi()
+
+      clear()
     }
 
     return {
@@ -118,10 +114,11 @@ export const useAuthStore = defineStore(
       initToken,
       getToken,
       setToken,
-      clearToken,
+      clear,
       getRefreshToken,
       toLogin,
       login,
+      logout,
     }
   },
   { persist: true },

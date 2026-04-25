@@ -41,9 +41,6 @@ export default {
   },
   "message": {},
   "pages": {
-    "403": {
-      "noPermission": "没有权限"
-    },
     "(auth)": {
       "(permission)": {
         "(admin)": {
@@ -66,11 +63,7 @@ export default {
           "backToUserHome": "回到用户首页",
           "basicInfo": "基础信息",
           "advancedSettings": "高级设置",
-          "childRouteContent": "子路由内容会渲染在这个 NuxtPage 标签位置",
-          "forbiddenAccess": "禁止访问 - 403",
-          "noPermissionToAccess": "你没有权限访问该页面。",
-          "forbiddenAccess403": "403 禁止访问",
-          "noPermissionToView": "你没有权限查看该内容。"
+          "childRouteContent": "子路由内容会渲染在这个 NuxtPage 标签位置"
         }
       },
       "contact": {
@@ -79,6 +72,9 @@ export default {
     },
     "catchAllRoute": {
       "noFound": "页面不存在"
+    },
+    "forbidden": {
+      "noPermission": "没有权限"
     },
     "login": {
       "login": "登录",

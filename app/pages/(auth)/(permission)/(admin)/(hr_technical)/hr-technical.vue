@@ -2,7 +2,7 @@
 const routes = [
   { path: '/hr', text: 'hr' },
   { path: '/technical', text: 'technical' },
-].filter(item => usePermission(item.path))
+].filter(item => usePermissionPage(item.path))
 </script>
 
 <template>

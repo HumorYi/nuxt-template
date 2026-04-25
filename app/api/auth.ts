@@ -12,3 +12,17 @@ export async function login(body: LoginBody) {
 
   return res.data.value as ApiResponse<LoginRes>
 }
+
+export async function logout() {
+  const res = await post('/logout')
+
+  return res.data.value as ApiResponse<LoginRes>
+}
+
+export async function refreshToken(token: string) {
+  const res = await post('/refresh-token', {
+    headers: { 'X-Refresh-Token': token },
+  })
+
+  return res.data.value as ApiResponse<LoginRes>
+}

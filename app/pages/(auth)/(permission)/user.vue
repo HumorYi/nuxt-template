@@ -7,7 +7,7 @@ const routes = [
   { path: '/user', text: userLang('backToUserHome') },
   { path: '/user/base', text: userLang('basicInfo') },
   { path: '/user/advance', text: userLang('advancedSettings') },
-].filter(item => usePermission(item.path))
+].filter(item => usePermissionPage(item.path))
 </script>
 
 <template>
