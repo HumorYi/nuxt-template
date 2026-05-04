@@ -63,10 +63,10 @@ export const useUserStore = defineStore('user', () => {
       return false
     }
 
-    return hasMiddlewarePermission(router.resolve(targetRoute.path) as RouteLocationNormalizedGeneric)
+    return hasPermissionPageByMiddleware(router.resolve(targetRoute.path) as RouteLocationNormalizedGeneric)
   }
 
-  function hasMiddlewarePermission(to: RouteLocationNormalizedGeneric) {
+  function hasPermissionPageByMiddleware(to: RouteLocationNormalizedGeneric) {
     if (!user.value) {
       return false
     }
@@ -139,7 +139,7 @@ export const useUserStore = defineStore('user', () => {
     getUser,
     isLogin,
     hasPermissionPage,
-    hasMiddlewarePermission,
+    hasPermissionPageByMiddleware,
     hasPermissionFeature,
   }
 })

@@ -152,6 +152,7 @@ export default defineNuxtConfig({
   },
 
   piniaPluginPersistedstate: {
+    key: `__persisted__%id`,
     storage: 'localStorage',
     cookieOptions: { sameSite: 'lax' },
     debug: isDev,
@@ -277,7 +278,7 @@ export default defineNuxtConfig({
     },
 
     'pages:resolved': function (pages: NuxtPage[]) {
-      function setMiddleware(pages: NuxtPage[]) {
+      function setMetaGroups(pages: NuxtPage[]) {
         if (!pages?.length)
           return
 
@@ -285,24 +286,20 @@ export default defineNuxtConfig({
           page.meta ||= {}
 
           const { meta, children } = page
-          const { groups = [] } = meta
-          const isAuth = groups.includes('auth')
-          const isPermission = groups.includes('permission')
+          const groups = (meta.groups || []) as string[]
+          const lastGroups: string[] = []
 
-          if (isPermission) {
-            meta.middleware = ['permission', ...(meta.middleware || [])]
+          groups?.forEach(group => lastGroups.push(...group.split('_')))
+
+          meta.groups = lastGroups
+
+          if (children) {
+            setMetaGroups(children)
           }
-
-          if (isAuth) {
-            meta.middleware = ['auth', ...(meta.middleware || [])]
-          }
-
-          if (children)
-            setMiddleware(children)
         }
       }
 
-      setMiddleware(pages)
+      setMetaGroups(pages)
     },
 
     'imports:dirs': (dirs: string[]) => {
