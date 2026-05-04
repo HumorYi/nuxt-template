@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{ text?: string }>()
 
-const commonLang = useLangCommon()
+const langComponent = useLangComponent('BackHome')
 </script>
 
 <template>
@@ -14,7 +14,7 @@ const commonLang = useLangCommon()
       class="mt-6 rounded px-6 py-2 text-white bg-blue-600"
       @click="$router.push('/')"
     >
-      {{ commonLang('backHome') }}
+      {{ langComponent('backHome') }}
     </button>
   </div>
 </template>

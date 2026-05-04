@@ -1,18 +1,12 @@
 export default {
-  "common": {
-    "backHome": "返回首页"
-  },
+  "common": {},
   "components": {
-    "CustomTest": {
-      "title": "自定义测试"
+    "BackHome": {
+      "backHome": "返回首页"
     },
-    "test": {
-      "CustomUse": {
-        "title": "自定義測試 嵌套",
-        "test": {
-          "age": "年龄"
-        }
-      }
+    "CustomLoading": {
+      "global": "加载中",
+      "test": "test 加载中"
     }
   },
   "error": {
@@ -34,10 +28,6 @@ export default {
       "header": "头部",
       "footer": "底部"
     }
-  },
-  "loading": {
-    "global": "加载中",
-    "test": "test 加载中"
   },
   "message": {},
   "pages": {

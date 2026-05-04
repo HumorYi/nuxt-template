@@ -1,5 +1,5 @@
-import type { ApiResponse } from '~/types/api'
-import type { UserRes } from '~/types/user'
+import type { UserRes } from '~/types/api/user'
+import type { ApiResponse } from '~/types/http'
 import { getPreUrl } from '~/utils/api'
 
 const { get } = useApi({ preUrl: getPreUrl(import.meta.url) })

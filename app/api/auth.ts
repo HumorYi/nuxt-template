@@ -1,5 +1,5 @@
-import type { ApiResponse } from '~/types/api'
-import type { LoginBody, LoginRes } from '~/types/auth'
+import type { LoginBody, LoginRes } from '~/types/api/auth'
+import type { ApiResponse } from '~/types/http'
 import { getPreUrl } from '~/utils/api'
 
 const { post } = useApi({ preUrl: getPreUrl(import.meta.url) })

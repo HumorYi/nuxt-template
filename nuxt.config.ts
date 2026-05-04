@@ -1,5 +1,5 @@
 import type { NuxtPage } from 'nuxt/schema'
-import type { ApiPluginConfig } from './app/types/api'
+import type { ApiPluginConfig } from './app/types/http'
 import fs from 'node:fs'
 import { resolve } from 'node:path'
 import { env } from 'node:process'

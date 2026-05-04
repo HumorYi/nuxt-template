@@ -98,7 +98,17 @@ function syncTargetFile(sourceData, targetFile) {
 
   // 写入同步后的内容
   writeFileContent(originFile, cloneSourceData)
-  writeFileContent(waitTranslateFile, waitTranslateData)
+
+  // 过滤出未翻译的键值对
+  const newWaitTranslateData = {}
+
+  Object.entries(waitTranslateData).forEach(([k, v]) => {
+    if (!translatedData[k]) {
+      newWaitTranslateData[k] = v
+    }
+  })
+
+  writeFileContent(waitTranslateFile, newWaitTranslateData)
 }
 
 // 开始同步

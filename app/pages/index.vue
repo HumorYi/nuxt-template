@@ -1,35 +1,12 @@
-<script setup>
-const config = useRuntimeConfig()
-const siteLang = useLangSite()
+<script setup lang="ts">
+const langSite = useLangSite()
+const userStore = useUserStore()
+const authStore = useAuthStore()
 
 useHead({
   script: [
     {
       type: 'application/ld+json',
-      children: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Organization',
-        'name': siteLang('name'),
-        'legalName': siteLang('legalName'),
-        'url': config.public.site.url,
-        'logo': config.public.site.logo,
-        'contactPoint': [
-          {
-            '@type': 'ContactPoint',
-            'telephone': '400',
-            'contactType': 'customer service',
-            'areaServed': 'CN',
-            'availableLanguage': 'zh-CN',
-          },
-        ],
-        'address': {
-          '@type': 'PostalAddress',
-          'streetAddress': siteLang('address'),
-          'addressLocality': siteLang('city'),
-          'postalCode': 'XXXXXX',
-          'addressCountry': 'CN',
-        },
-      }),
     },
   ],
 })
@@ -41,8 +18,8 @@ useSeoMeta({
 useSchemaOrg([
   {
     '@type': 'Article',
-    'headline': siteLang('headline'),
-    'author': [{ '@type': 'Person', 'name': siteLang('author') }],
+    'headline': langSite('headline'),
+    'author': [{ '@type': 'Person', 'name': langSite('author') }],
     'datePublished': '2026-03-24',
   },
 ])
@@ -50,7 +27,10 @@ useSchemaOrg([
 
 <template>
   <div class="bg-d">
-    <NuxtLink to="/login">
+    <button v-if="userStore.isLogin" @click="authStore.logout">
+      logout
+    </button>
+    <NuxtLink v-else to="/login">
       login
     </NuxtLink>
   </div>

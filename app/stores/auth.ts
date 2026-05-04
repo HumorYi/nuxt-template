@@ -1,5 +1,5 @@
 import type { RouteLocationNormalizedLoadedGeneric } from 'vue-router'
-import type { LoginBody, LoginRes } from '~/types/auth'
+import type { LoginBody, LoginRes } from '~/types/api/auth'
 import { login as loginApi, logout as logoutApi, refreshToken as refreshTokenApi } from '~/api/auth'
 
 export const useAuthStore = defineStore(

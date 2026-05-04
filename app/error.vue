@@ -12,3 +12,5 @@ defineProps<{ error: NuxtError }>()
     </NuxtLink>
   </div>
 </template>
+
+<style scoped lang="scss"></style>

@@ -18,8 +18,6 @@ export const useLangComponent = (path: string) => useLang(`components.${path}`)
 
 export const useLangCommon = () => useLang(`common`)
 
-export const useLangLoading = () => useLang(`loading`)
-
 export const useLangSite = () => useLang(`site`)
 
 export const useLangMessage = () => useLang(`message`)

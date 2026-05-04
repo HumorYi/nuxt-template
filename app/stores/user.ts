@@ -4,8 +4,8 @@ import type {
   RouteRecordNormalized,
 } from 'vue-router'
 
+import type { UserRes, UserRoute } from '~/types/api/user'
 import type { FEATURE_TYPE } from '~/types/permission'
-import type { UserRes, UserRoute } from '~/types/user'
 import { getUser as getUserApi } from '~/api/user'
 import PERMISSION_FEATURE from '~/config/permission-feature'
 

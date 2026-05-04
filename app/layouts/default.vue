@@ -1,13 +1,13 @@
 <script setup lang="ts">
-const layoutLang = useLangLayout('default')
+const langLayout = useLangLayout('default')
 </script>
 
 <template>
   <div>
-    <header>{{ layoutLang('header') }}</header>
+    <header>{{ langLayout('header') }}</header>
 
     <slot />
 
-    <footer>{{ layoutLang('footer') }}</footer>
+    <footer>{{ langLayout('footer') }}</footer>
   </div>
 </template>

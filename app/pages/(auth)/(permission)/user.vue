@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import { useLangUserPage } from '~/composables/useLang'
 
-const userLang = useLangUserPage()
+const langUserPage = useLangUserPage()
 
 const routes = [
-  { path: '/user', text: userLang('backToUserHome') },
-  { path: '/user/base', text: userLang('basicInfo') },
-  { path: '/user/advance', text: userLang('advancedSettings') },
+  { path: '/user', text: langUserPage('backToUserHome') },
+  { path: '/user/base', text: langUserPage('basicInfo') },
+  { path: '/user/advance', text: langUserPage('advancedSettings') },
 ].filter(item => usePermissionPage(item.path))
 </script>
 
 <template>
   <div class="index">
-    <h2>{{ userLang('userCenterParent') }}</h2>
+    <h2>{{ langUserPage('userCenterParent') }}</h2>
 
     <!-- 子路由导航 -->
     <ul>

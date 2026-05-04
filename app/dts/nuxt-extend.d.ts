@@ -1,5 +1,5 @@
 import type { FetchInstance } from 'ofetch'
-import type { ApiPluginConfig, FetchOptionsExtend } from '~/types/api'
+import type { ApiPluginConfig, FetchOptionsExtend } from '~/types/http'
 import 'nuxt/app'
 
 interface API {

@@ -20,7 +20,7 @@
 - app/api 存放所有 api 接口，按模块划分，使用示例：app/api/user.ts
 
   ```ts
-  import type { ApiResponse } from '~/types/api'
+  import type { ApiResponse } from '~/types/http'
   import type { UserRes } from '~/types/user'
 
   const { get } = useApi({ preUrl: '/user' })

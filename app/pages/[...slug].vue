@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const pageLang = useLangPage('catchAllRoute')
+const langPage = useLangPage('catchAllRoute')
 </script>
 
 <template>
-  <BackHome :text="pageLang('noFound')" />
+  <BackHome :text="langPage('noFound')" />
 </template>
 
 <style lang="scss" scoped></style>

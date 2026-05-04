@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { locale, locales,setLocale } = useI18n()
+const { locale, locales, setLocale } = useI18n()
 </script>
 
 <template>
@@ -18,6 +18,9 @@ const { locale, locales,setLocale } = useI18n()
 
 <style scoped lang="scss">
 .language-switcher {
+  position: fixed;
+  top: 10px;
+  right: 10px;
   display: flex;
   gap: 8px;
   align-items: center;

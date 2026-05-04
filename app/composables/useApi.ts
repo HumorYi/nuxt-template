@@ -1,7 +1,7 @@
 import type { NitroFetchRequest } from 'nitropack'
 
 import type { UseFetchOptions } from 'nuxt/app'
-import type { HttpMethod } from '~/types/api'
+import type { HttpMethod } from '~/types/http'
 import { useFetch, useNuxtApp } from 'nuxt/app'
 
 interface Option { preUrl?: string }

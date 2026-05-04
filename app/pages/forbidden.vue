@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const pageLang = useLangPage('forbidden')
+const langPage = useLangPage('forbidden')
 </script>
 
 <template>
-  <BackHome :text="pageLang('noPermission')" />
+  <BackHome :text="langPage('noPermission')" />
 </template>
 
 <style lang="scss" scoped></style>

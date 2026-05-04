@@ -1,53 +1,13 @@
-<script lang="ts" setup>
-import { useLangLoading } from './composables/useLang'
-
-const loadingLang = useLangLoading()
-const loadingStore = useLoadingStore()
-</script>
+<script lang="ts" setup></script>
 
 <template>
-  <div>
-    <div
-      v-if="loadingStore.state.global"
-      class="global-loading"
-    >
-      {{ loadingLang('global') }}
-    </div>
+  <CustomLoading />
 
-    <div
-      v-if="loadingStore.state.test"
-      class="global-loading"
-    >
-      {{ loadingLang('test') }}
-    </div>
+  <LanguageSwitcher />
 
-    <div class="lang">
-      <LanguageSwitcher />
-    </div>
-
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
 </template>
 
-<style scoped>
-  .global-loading {
-    /* position: fixed; */
-    inset: 0;
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    color: white;
-    background: rgb(0, 0, 0, 50%);
-    user-select: none;
-  }
-
-  .lang {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-  }
-</style>
+<style scoped lang="scss"></style>

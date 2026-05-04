@@ -1,10 +1,10 @@
 <script setup lang="ts">
-const pageLang = useLangAdminPage('admin')
+const langPage = useLangAdminPage('admin')
 </script>
 
 <template>
   <div class="admin">
-    {{ pageLang('admin') }}
+    {{ langPage('admin') }}
   </div>
 </template>
 

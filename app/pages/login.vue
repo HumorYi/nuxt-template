@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const pageLang = useLangPage('login')
+const langPage = useLangPage('login')
 const authStore = useAuthStore()
 
 async function login() {
@@ -13,10 +13,8 @@ async function login() {
 <template>
   <div>
     <button @click="login">
-      {{ pageLang('login') }}
+      {{ langPage('login') }}
     </button>
-
-    <div style=" width: 1000px;height: 1000px; background-color: red;" />
   </div>
 </template>
 

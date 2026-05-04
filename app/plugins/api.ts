@@ -14,7 +14,7 @@ import type {
   HttpMethod,
   RequestCacheItem,
   RequestMeta,
-} from '~/types/api'
+} from '~/types/http'
 
 // ========================= 全局默认配置 =========================
 /**
@@ -722,6 +722,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         // 调用store刷新token
         const newToken = await authStore.getRefreshToken()
         if (!newToken) {
+          authStore.clear()
+
           throw new Error('tokenRefreshFailed')
         }
 

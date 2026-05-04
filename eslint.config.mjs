@@ -25,15 +25,10 @@ export default withNuxt(
     unocss: true,
     rules: {
       'no-console': 'off',
-      'no-async-promise-executor': 'off',
+      'no-async-promise-executor': 'off'
     },
   }, {
-    files: [
-      'app/pages/**/*.vue',
-      'app/layouts/**/*.vue',
-      'app/app.vue',
-      'app/error.vue',
-    ],
+    files: ['app/**/*.vue'],
     rules: { 'vue/multi-word-component-names': 'off' },
   }),
 )

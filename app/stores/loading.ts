@@ -1,4 +1,4 @@
-import type { LoadingState } from '~/types/api'
+import type { LoadingState } from '~/types/http'
 
 export const useLoadingStore = defineStore('loading', () => {
   const state = ref<LoadingState>({ global: false })

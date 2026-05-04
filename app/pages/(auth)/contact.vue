@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const authPageLang = useLangAuthPage('contact')
+const langAuthPage = useLangAuthPage('contact')
 
 useSeoMeta({
   title: 'site.contactTitle',
@@ -10,7 +10,7 @@ useSeoMeta({
 
 <template>
   <div class="contact bg-d">
-    {{ authPageLang('desc') }}
+    {{ langAuthPage('desc') }}
   </div>
 </template>
 
