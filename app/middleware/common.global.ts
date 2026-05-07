@@ -4,7 +4,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const userStore = useUserStore()
   const { groups = [] } = to.meta
 
-  nuxtApp.$cancelAllRequest()
+  nuxtApp.$cancelAllReq()
 
   // 如果没有登录，且有token，获取用户信息
   if (!userStore.isLogin && authStore.getToken()) {

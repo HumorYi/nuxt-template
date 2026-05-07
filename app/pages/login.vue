@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const langPage = useLangPage('login')
+const langPage = useLangPage()
 const authStore = useAuthStore()
 
 async function login() {

@@ -1,7 +1,8 @@
 // 生成组件唯一标识（基于Vue实例UID）
 function generateComponentKey(): string {
-  if (import.meta.server)
+  if (import.meta.server) {
     return ''
+  }
 
   const instance = getCurrentInstance()
 
@@ -13,26 +14,15 @@ export function useApiComponent() {
   const componentKey = generateComponentKey()
 
   if (!componentKey) {
-    if (import.meta.client) {
-      console.warn('[API] 无法获取组件实例，无法自动清理请求')
-    }
-
-    return {
-      componentKey,
-      cancelComponentRequests: () => {},
-    }
+    return { componentKey, cancel: () => {} }
   }
 
-  const { $cancelComponentRequests } = useNuxtApp()
+  const { $cancelComponentAllReq } = useNuxtApp()
+  const cancel = (reason?: string) =>
+    $cancelComponentAllReq(componentKey, reason)
 
   // 组件卸载时自动清理所有关联请求
-  onUnmounted(() => {
-    $cancelComponentRequests(componentKey, 'component unmounted')
-  })
+  onUnmounted(() => cancel('component unmounted'))
 
-  return {
-    componentKey,
-    cancelComponentRequests: (reason?: string) =>
-      $cancelComponentRequests(componentKey, reason),
-  }
+  return { componentKey, cancel }
 }

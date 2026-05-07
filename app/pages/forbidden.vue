@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const langPage = useLangPage('forbidden')
+const langPage = useLangPage()
 </script>
 
 <template>

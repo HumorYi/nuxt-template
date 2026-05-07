@@ -465,7 +465,7 @@ export default defineNuxtPlugin((nuxtApp) => {
    * @param key 取消键
    * @param reason 取消原因
    */
-  const cancelRequest = (key: string, reason = ''): void => {
+  const cancelReq = (key: string, reason = ''): void => {
     const abortState = abortStateMap.get(key)
     if (!abortState) {
       return
@@ -478,8 +478,8 @@ export default defineNuxtPlugin((nuxtApp) => {
    * 取消所有请求
    * @param reason 取消原因
    */
-  const cancelAllRequest = (reason = '路由跳转'): void => {
-    abortStateMap.forEach((val, key) => cancelRequest(key, reason))
+  const cancelAllReq = (reason = '路由跳转'): void => {
+    abortStateMap.forEach((val, key) => cancelReq(key, reason))
   }
 
   /**
@@ -487,13 +487,13 @@ export default defineNuxtPlugin((nuxtApp) => {
    * @param componentKey 组件标识
    * @param reason 取消原因
    */
-  const cancelComponentRequests = (
+  const cancelComponentAllReq = (
     componentKey: string,
     reason = '组件销毁',
   ): void => {
     abortStateMap.forEach((val, key) => {
       if (componentKey && componentKey === val.componentKey) {
-        cancelRequest(key, reason)
+        cancelReq(key, reason)
       }
     })
   }
@@ -505,7 +505,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     const expireTime = Date.now() - 30 * 1000
     abortStateMap.forEach(({ inFlightRequest }, key) => {
       if (expireTime > inFlightRequest.createTime) {
-        cancelRequest(key, '请求超时，自动取消')
+        cancelReq(key, '请求超时，自动取消')
       }
     })
   }
@@ -515,7 +515,7 @@ export default defineNuxtPlugin((nuxtApp) => {
    * 清理缓存（单个/全部）
    * @param key 缓存键（可选）
    */
-  const clearRequestCache = (key?: string): void => {
+  const clearReqCache = (key?: string): void => {
     if (key) {
       const { [key]: _, ...newCache } = requestCache.value
       requestCache.value = newCache
@@ -1117,7 +1117,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     // 页面卸载时清理所有资源
     window.addEventListener('beforeunload', () => {
       cleanCacheTimer()
-      cancelAllRequest('页面卸载，取消请求')
+      cancelAllReq('页面卸载，取消请求')
     })
   }
 
@@ -1125,10 +1125,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   return {
     provide: {
       api: createApiClient(),
-      cancelRequest,
-      cancelAllRequest,
-      cancelComponentRequests,
-      clearRequestCache,
+      cancelReq,
+      cancelAllReq,
+      cancelComponentAllReq,
+      clearReqCache,
     },
   }
 })

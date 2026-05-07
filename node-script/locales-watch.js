@@ -2,9 +2,9 @@ import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 
-const rootDir = process.cwd()
-const localesDir = path.join(rootDir, 'i18n', 'locales')
-const customDir = path.join(rootDir, 'i18n', 'custom')
+const rootDir = path.join(process.cwd(), 'i18n')
+const localesDir = path.join(rootDir, 'locales')
+const customDir = path.join(rootDir, 'custom')
 
 // 监听目录及生成目标文件
 const configs = [

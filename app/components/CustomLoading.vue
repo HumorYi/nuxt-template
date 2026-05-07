@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const langComponent = useLangComponent('CustomLoading')
+const langComponent = useLangComponent()
 const loadingStore = useLoadingStore()
 </script>
 

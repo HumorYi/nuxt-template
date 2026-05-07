@@ -27,12 +27,14 @@ useSchemaOrg([
 
 <template>
   <div class="bg-d">
-    <button v-if="userStore.isLogin" @click="authStore.logout">
-      logout
-    </button>
-    <NuxtLink v-else to="/login">
-      login
-    </NuxtLink>
+    <ClientOnly>
+      <button v-if="userStore.isLogin" @click="authStore.logout">
+        logout
+      </button>
+      <NuxtLink v-else to="/login">
+        login
+      </NuxtLink>
+    </ClientOnly>
   </div>
 </template>
 

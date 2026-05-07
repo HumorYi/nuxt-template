@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const langAuthPage = useLangAuthPage('contact')
+const langAuthPage = useLangAuthPage()
 
 useSeoMeta({
   title: 'site.contactTitle',

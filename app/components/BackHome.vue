@@ -1,7 +1,7 @@
 <script setup lang="ts">
 defineProps<{ text?: string }>()
 
-const langComponent = useLangComponent('BackHome')
+const langComponent = useLangComponent()
 </script>
 
 <template>

@@ -4,6 +4,7 @@ import fs from 'node:fs'
 import { resolve } from 'node:path'
 import { env } from 'node:process'
 import eslintPlugin from 'vite-plugin-eslint2'
+import vitePluginReplaceCallerFilename from './vite-plugins/vite-plugin-replace-caller-filename'
 
 const isDev = env.NODE_ENV === 'development'
 const isProd = env.NODE_ENV === 'production'
@@ -76,7 +77,7 @@ export default defineNuxtConfig({
         },
       },
     },
-    plugins: [eslintPlugin()],
+    plugins: [eslintPlugin(), isProd && vitePluginReplaceCallerFilename()],
   },
 
   app: {
@@ -167,7 +168,8 @@ export default defineNuxtConfig({
       { code: 'en', language: 'en-US', name: 'English', file: 'en.js' },
     ],
     vueI18n: './i18n/i18n.config.ts',
-    strategy: 'prefix_except_default',
+    // strategy: 'prefix_except_default',
+    strategy: 'no_prefix',
     detectBrowserLanguage: {
       fallbackLocale: defaultLocale,
     },

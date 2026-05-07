@@ -4,10 +4,10 @@ import 'nuxt/app'
 
 interface API {
   $api: FetchInstance<unknown, FetchOptionsExtend>
-  $cancelRequest: () => void
-  $cancelAllRequest: () => void
-  $clearRequestCache: () => void
-  $cancelComponentRequests: (_componentKey: string, _reason?: string) => void
+  $cancelReq: () => void
+  $cancelAllReq: () => void
+  $clearReqCache: () => void
+  $cancelComponentAllReq: (_componentKey: string, _reason?: string) => void
 }
 
 declare module 'nuxt/schema' {
