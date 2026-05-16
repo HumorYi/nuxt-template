@@ -4,7 +4,6 @@ import type {
   ApiPluginConfig,
   CustomCacheConfig,
   CustomGlobalCacheConfig,
-  CustomLoadingConfig,
   CustomRequestConfig,
   CustomRetryConfig,
   CustomToastConfig,
@@ -17,14 +16,6 @@ import type {
 } from '~/types/http'
 
 // ========================= 全局默认配置 =========================
-/**
- * Loading 全局默认配置
- */
-const customLoadingConfig: CustomLoadingConfig = {
-  enable: false,
-  key: 'global',
-}
-
 /**
  * 缓存全局默认配置
  */
@@ -265,7 +256,6 @@ function logRequest(
  * @param apiPluginConfig 运行时配置
  */
 function syncApiConfig(apiPluginConfig: ApiPluginConfig) {
-  Object.assign(customLoadingConfig, apiPluginConfig.customLoading || {})
   Object.assign(customCacheConfig, apiPluginConfig.customCache || {})
   Object.assign(customRetryConfig, apiPluginConfig.customRetry || {})
   Object.assign(customRequestConfig, apiPluginConfig.customRequest || {})
@@ -360,8 +350,9 @@ function generateCacheKey(
 export default defineNuxtPlugin((nuxtApp) => {
   const runtimeConfig = useRuntimeConfig()
   const { apiPlugin } = runtimeConfig.public
-  if (apiPlugin)
+  if (apiPlugin) {
     syncApiConfig(apiPlugin)
+  }
 
   const authStore = useAuthStore()
   const i18n = nuxtApp.$i18n as any
@@ -392,62 +383,31 @@ export default defineNuxtPlugin((nuxtApp) => {
   let flightRequestCleanTimer: Timer = null
 
   // ========================= Loading 状态管理 =========================
-  /**
-   * 开启Loading（计数模式，避免重复开关）
-   * @param key 取消键
-   */
-  const incrLoading = (key: string) => {
-    if (!import.meta.client) {
-      return
-    }
 
-    const abortState = abortStateMap.get(key)
+  const loadingMap = new Map<string, number>()
 
-    if (!abortState?.loadingKey) {
-      return
-    }
+  function startLoading(key: string) {
+    const val = (loadingMap.get(key) || 0) + 1
 
-    let count = 0
-    abortStateMap.forEach((state) => {
-      if (state.loadingKey === abortState.loadingKey) {
-        count++
-      }
-    })
+    loadingStore.open(key)
 
-    // 首次请求时开启loading
-    if (count === 1) {
-      loadingStore.open(abortState.loadingKey)
-    }
+    loadingMap.set(key, val)
   }
 
-  /**
-   * 关闭Loading
-   * @param key 取消键
-   */
-  const decrLoading = (key: string) => {
-    if (!import.meta.client) {
+  function stopLoading(key: string) {
+    if (!loadingMap.has(key))
       return
+
+    const val = (loadingMap.get(key) || 0) - 1
+
+    if (val === 0) {
+      loadingStore.close(key)
+
+      loadingMap.delete(key)
     }
-
-    const abortState = abortStateMap.get(key)
-    if (!abortState?.loadingKey) {
-      return
+    else {
+      loadingMap.set(key, val)
     }
-
-    let count = 0
-
-    abortStateMap.forEach((state) => {
-      if (state.loadingKey === abortState.loadingKey) {
-        count++
-      }
-    })
-
-    // 最后一个请求完成时关闭loading
-    if (count === 1) {
-      loadingStore.close(abortState.loadingKey)
-    }
-
-    abortState.loadingKey = undefined
   }
 
   // ========================= 请求清理/取消 =========================
@@ -455,23 +415,27 @@ export default defineNuxtPlugin((nuxtApp) => {
    * 清理单个请求（关闭loading+移除控制器）
    * @param key 取消键
    */
-  const clearRequest = (key: string): void => {
-    decrLoading(key)
-    abortStateMap.delete(key)
+  const clearRequest = (abortKey: string, loadingKey: string): void => {
+    stopLoading(loadingKey)
+
+    abortStateMap.delete(abortKey)
   }
 
   /**
    * 取消单个请求
-   * @param key 取消键
+   * @param abortKey 取消键
    * @param reason 取消原因
    */
-  const cancelReq = (key: string, reason = ''): void => {
-    const abortState = abortStateMap.get(key)
+  const cancelReq = (abortKey: string, reason = ''): void => {
+    const abortState = abortStateMap.get(abortKey)
+
     if (!abortState) {
       return
     }
+
     abortState.abortController.abort(`${reason} canceled`)
-    clearRequest(key)
+
+    clearRequest(abortKey, abortState.loadingKey || '')
   }
 
   /**
@@ -479,7 +443,7 @@ export default defineNuxtPlugin((nuxtApp) => {
    * @param reason 取消原因
    */
   const cancelAllReq = (reason = '路由跳转'): void => {
-    abortStateMap.forEach((val, key) => cancelReq(key, reason))
+    abortStateMap.forEach((val, abortKey) => cancelReq(abortKey, reason))
   }
 
   /**
@@ -491,9 +455,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     componentKey: string,
     reason = '组件销毁',
   ): void => {
-    abortStateMap.forEach((val, key) => {
+    abortStateMap.forEach((val, abortKey) => {
       if (componentKey && componentKey === val.componentKey) {
-        cancelReq(key, reason)
+        cancelReq(abortKey, reason)
       }
     })
   }
@@ -503,9 +467,9 @@ export default defineNuxtPlugin((nuxtApp) => {
    */
   const cleanExpiredFlightRequests = (): void => {
     const expireTime = Date.now() - 30 * 1000
-    abortStateMap.forEach(({ inFlightRequest }, key) => {
+    abortStateMap.forEach(({ inFlightRequest }, abortKey) => {
       if (expireTime > inFlightRequest.createTime) {
-        cancelReq(key, '请求超时，自动取消')
+        cancelReq(abortKey, '请求超时，自动取消')
       }
     })
   }
@@ -971,6 +935,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       const {
         abortKey = generateAbortKey(baseURL, url, method, options, apiConfig),
         componentKey,
+        loadingKey = 'global',
       } = lastCustomRequestConfig
 
       // 请求元数据
@@ -1019,13 +984,6 @@ export default defineNuxtPlugin((nuxtApp) => {
           logRequest('response', requestMeta, { status: 20, data: '从缓存读取' })
           return cacheItem.data as T
         }
-      }
-
-      // 合并Loading配置
-      const lastCustomLoadingConfig: CustomLoadingConfig = {
-        ...customLoadingConfig,
-        ...apiConfig.customLoading,
-        ...options.customLoading,
       }
 
       // 创建请求取消控制器
@@ -1085,7 +1043,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         }
         finally {
           // 无论成功失败，清理请求
-          clearRequest(abortKey)
+          clearRequest(abortKey, loadingKey)
         }
       })()
 
@@ -1094,11 +1052,12 @@ export default defineNuxtPlugin((nuxtApp) => {
         abortController,
         inFlightRequest: { promise: requestPromise, createTime: Date.now() },
         componentKey,
-        loadingKey: import.meta.client && lastCustomLoadingConfig.enable ? lastCustomLoadingConfig.key : undefined,
+        loadingKey,
       })
 
       // 开启Loading
-      incrLoading(abortKey)
+      startLoading(loadingKey)
+
       return requestPromise
     }
 

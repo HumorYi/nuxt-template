@@ -7,7 +7,7 @@ const { post } = useApi({ preUrl: getPreUrl() })
 export async function login(body: LoginBody) {
   const res = await post('/login', {
     body,
-    // customLoading: { key: 'test' }
+    // customRequest: { loadingKey: 'test', },
   })
 
   return res.data.value as ApiResponse<LoginRes>

@@ -4,9 +4,9 @@ import 'nuxt/app'
 
 interface API {
   $api: FetchInstance<unknown, FetchOptionsExtend>
-  $cancelReq: () => void
-  $cancelAllReq: () => void
-  $clearReqCache: () => void
+  $cancelReq: (abortKey: string, reason?: string) => void
+  $cancelAllReq: (reason?: string) => void
+  $clearReqCache: (abortKey?: string) => void
   $cancelComponentAllReq: (_componentKey: string, _reason?: string) => void
 }
 

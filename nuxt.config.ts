@@ -49,10 +49,7 @@ export default defineNuxtConfig({
       apiOtherBase: env.NUXT_PUBLIC_API_OTHER_BASE,
       apiUrl: env.NUXT_PUBLIC_API_URL,
       apiOtherUrl: env.NUXT_PUBLIC_API_OTHER_URL,
-      apiPlugin: {
-        // customLoading: { enable: true, key: 'global' },
-        // timeout: 1 * 1000
-      } as ApiPluginConfig,
+      apiPlugin: {} as ApiPluginConfig,
       site: {
         url: env.NUXT_SITE_URL || '',
         logo: env.NUXT_SITE_LOGO || '',
