@@ -7,7 +7,6 @@ import type {
   CustomRequestConfig,
   CustomRetryConfig,
   CustomToastConfig,
-  ErrorResponse,
   FetchOptionConfig,
   FetchOptionsExtend,
   HttpMethod,
@@ -15,36 +14,24 @@ import type {
   RequestMeta,
 } from '~/types/http'
 
-// ========================= 全局默认配置 =========================
-/**
- * 缓存全局默认配置
- */
+type Timer = NodeJS.Timeout | null
+
 const customCacheConfig: CustomGlobalCacheConfig = {
   enable: false,
   ttl: 5 * 60 * 1000,
-  methods: ['GET'],
-  keyPrefix: 'api_cache_',
   maxSize: 100,
-  cleanInterval: 5 * 60 * 1000,
 }
 
-/**
- * 请求重试全局默认配置
- */
 const customRetryConfig: CustomRetryConfig = {
   maxCount: 0,
-  baseDelay: 1000,
+  baseDelay: 1 * 1000,
   maxDelay: 10 * 1000,
 }
 
-/**
- * 请求基础全局默认配置
- */
 const customRequestConfig: CustomRequestConfig = {
   timeout: 10 * 1000,
   token: true,
   serializeForm: true,
-  abortKeyPrefix: 'api_abort_',
   headers: {
     contentType: 'application/json;charset=utf-8',
     token: 'Authorization',
@@ -52,209 +39,19 @@ const customRequestConfig: CustomRequestConfig = {
   },
 }
 
-/**
- * 错误提示全局默认配置
- */
 const customToastConfig: CustomToastConfig = {
   timeout: 'error.timeout',
   networkError: 'error.networkError',
   tokenExpired: 'error.tokenExpired',
   tokenRefreshFailed: 'error.tokenRefreshFailed',
   serverError: 'error.serverError',
-  configError: 'error.configError',
-  duplicateRequest: 'error.duplicateRequest',
-  businessError: 'error.businessError',
-  csrfError: 'error.csrfError',
-  emptyToken: 'error.emptyToken',
 }
 
-/**
- * ofetch 基础请求配置
- */
 const fetchOptionConfig: FetchOptionConfig = {
   credentials: 'include',
   responseType: 'json',
 }
 
-/**
- * 定时器类型定义
- */
-type Timer = ReturnType<typeof setTimeout> | null
-
-// ========================= 工具函数 =========================
-/**
- * 生成对象哈希值（用于生成唯一缓存/取消键）
- * @param obj 任意对象
- * @returns 哈希字符串
- */
-function objectHash(obj: unknown): string {
-  if (obj === null || typeof obj !== 'object')
-    return String(obj)
-
-  if (Array.isArray(obj))
-    return `[${obj.map(objectHash).join(',')}]`
-
-  let hash = ''
-
-  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
-    hash += `${key}:${objectHash(value)};`
-  }
-  return hash
-}
-
-/**
- * 标准化请求头（统一格式）
- * @param headers 原始请求头
- * @returns 标准化后的请求头对象
- */
-function normalizeHeaders(headers?: HeadersInit): Record<string, string> {
-  const normalized: Record<string, string> = {}
-  if (!headers)
-    return normalized
-
-  try {
-    if (headers instanceof Headers) {
-      headers.forEach((value, key) => {
-        normalized[key] = value
-      })
-    }
-    else if (Array.isArray(headers)) {
-      headers.forEach(([key, value]) => {
-        normalized[key] = String(value)
-      })
-    }
-    else {
-      Object.entries(headers).forEach(([key, value]) => {
-        normalized[key] = String(value)
-      })
-    }
-  }
-  catch (e) {
-    console.error('[API] 标准化Headers失败', e)
-  }
-  return normalized
-}
-
-/**
- * 获取 CSRF Token（单例模式，避免重复查询DOM）
- * @returns csrfToken
- */
-const getCsrfToken = (() => {
-  let csrfToken: string | null = null
-  return (): string | null => {
-    // 服务端直接返回null
-    if (import.meta.server)
-      return null
-    // 缓存已获取的token
-    if (csrfToken)
-      return csrfToken
-    // 从meta标签获取token
-    const el = document.querySelector('meta[name="csrf-token"]')
-    csrfToken = (el as HTMLMetaElement)?.content || null
-    return csrfToken
-  }
-})()
-
-/**
- * 全局提示函数（支持外部注册自定义提示）
- */
-let toastFn: (_msg: string) => void = (msg) => {
-  console.log(`[提示] ${msg}`)
-}
-
-/**
- * 注册自定义提示组件
- * @param fn 提示函数
- */
-export function registerApiToast(fn: (_msg: string) => void): void {
-  toastFn = fn
-}
-
-/**
- * 翻译提示消息（支持 i18n 翻译键）
- * @param msg 消息内容或翻译键
- * @param i18n i18n 实例（可选）
- * @returns 翻译后的消息
- */
-function translateMessage(msg: string, i18n?: any): string {
-  if (!i18n)
-    return msg
-
-  try {
-    const translated = i18n.t(msg)
-    return translated !== msg ? translated : msg
-  }
-  catch {
-    return msg
-  }
-}
-
-/**
- * 请求日志模板
- */
-const logTemplate = {
-  error: null,
-  query: null,
-  body: null,
-  time: '',
-  type: '' as 'request' | 'response' | 'error',
-  method: '',
-  url: '',
-  status: 0,
-  data: null,
-  duration: 0,
-}
-
-/**
- * 控制台请求日志打印（仅开发环境+客户端）
- * @param type 日志类型
- * @param meta 请求元数据
- * @param extra 额外信息
- */
-function logRequest(
-  type: 'request' | 'response' | 'error',
-  meta: RequestMeta,
-  extra?: {
-    status?: number
-    data?: unknown
-    error?: unknown
-    duration?: number
-  },
-): void {
-  if (!import.meta.env.DEV || !import.meta.client)
-    return
-
-  try {
-    const timestamp = new Date().toLocaleTimeString()
-    const colorMap = {
-      request: '#4299e1',
-      response: '#48bb78',
-      error: '#e53e3e',
-    }
-    const logData = Object.assign(logTemplate, {
-      time: timestamp,
-      type,
-      url: meta.url,
-      method: meta.method,
-      query: JSON.stringify(meta.query),
-      body: JSON.stringify(meta.body),
-      ...extra,
-    })
-    console[type === 'error' ? 'error' : 'log'](
-      `[%cAPI ${type} ${timestamp}]`,
-      `color:${colorMap[type]};font-weight:500`,
-      logData,
-    )
-  }
-  catch (e) {
-    console.error('[API] 打印日志失败', e)
-  }
-}
-
-/**
- * 同步运行时配置到全局配置
- * @param apiPluginConfig 运行时配置
- */
 function syncApiConfig(apiPluginConfig: ApiPluginConfig) {
   Object.assign(customCacheConfig, apiPluginConfig.customCache || {})
   Object.assign(customRetryConfig, apiPluginConfig.customRetry || {})
@@ -270,73 +67,124 @@ function syncApiConfig(apiPluginConfig: ApiPluginConfig) {
   })
 }
 
-/**
- * 生成请求取消唯一键
- * @param baseURL 基础地址
- * @param url 请求地址
- * @param method 请求方法
- * @param options 请求配置
- * @param apiConfig 实例配置
- * @returns 唯一取消键
- */
+function objectHash(obj: unknown): string {
+  if (obj === null || typeof obj !== 'object') {
+    return String(obj)
+  }
+
+  if (Array.isArray(obj)) {
+    return `[${obj.map(objectHash).join(',')}]`
+  }
+
+  let hash = ''
+
+  for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+    hash += `${key}:${objectHash(value)};`
+  }
+
+  return hash
+}
+
+function normalizeHeaders(headers?: HeadersInit): Record<string, string> {
+  const normalized: Record<string, string> = {}
+
+  if (headers) {
+    try {
+      if (headers instanceof Headers) {
+        headers.forEach((value, key) => {
+          normalized[key] = value
+        })
+      }
+      else if (Array.isArray(headers)) {
+        headers.forEach(([key, value]) => {
+          normalized[key] = String(value)
+        })
+      }
+      else {
+        Object.entries(headers).forEach(([key, value]) => {
+          normalized[key] = String(value)
+        })
+      }
+    }
+    catch (e) {
+      console.error('[API] 标准化Headers失败', e)
+    }
+  }
+
+  return normalized
+}
+
+const getCsrfToken = (() => {
+  let csrfToken: string | undefined
+
+  return () => {
+    if (import.meta.server) {
+      return
+    }
+
+    if (!csrfToken) {
+      const el = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement
+
+      csrfToken = el?.content
+    }
+
+    return csrfToken
+  }
+})()
+
+let toastFn: (msg: string) => void = (msg) => {
+  console.log(`[提示] ${msg}`)
+}
+
+export function registerApiToast(fn: (msg: string) => void): void {
+  toastFn = fn
+}
+
+function translateMessage(msg: string, i18n?: any): string {
+  if (!i18n) {
+    return msg
+  }
+
+  try {
+    const translated = i18n.t(msg)
+
+    return translated !== msg ? translated : msg
+  }
+  catch {
+    return msg
+  }
+}
+
 function generateAbortKey(
   baseURL: string,
   url: string,
   method: HttpMethod,
   options: FetchOptionsExtend,
-  apiConfig: ApiInstanceConfig,
 ): string {
-  const { abortKeyPrefix }: CustomRequestConfig = {
-    ...customRequestConfig,
-    ...apiConfig.customRequest,
-    ...options.customRequest,
-  }
-
   try {
-    const lastHeaders: Record<string, unknown> = {
-      ...customRequestConfig.headers,
-      ...apiConfig.customRequest?.headers,
-      ...options.headers,
-    }
-    // 排除token、csrfToken，避免影响唯一键生成
-    const excludes = ['token', 'csrfToken'].map(key => lastHeaders[key] || '')
-
-    const requestKey = {
+    return objectHash({
       baseURL,
       url,
-      method: method.toUpperCase(),
+      method,
       body: options.body,
       query: options.query,
-      headers: Object.entries(options.headers || {})
-        .filter(([k]) => !excludes.includes(k))
-        .reduce((o, [k, v]) => ({ ...o, [k]: v }), {}),
-    }
-
-    return `${abortKeyPrefix}${objectHash(requestKey)}`
+    })
   }
   catch (e) {
     console.error('[API] 生成AbortKey失败', e)
-    return `${abortKeyPrefix}${baseURL}_${url}_${method}_${Date.now()}`
+
+    return `${baseURL}_${url}_${method}`
   }
 }
 
-/**
- * 生成缓存唯一键
- * @param baseURL 基础地址
- * @param url 请求地址
- * @param method 请求方法
- * @param options 请求配置
- * @param keyPrefix 缓存前缀
- * @returns 唯一缓存键
- */
 function generateCacheKey(
   baseURL: string,
   url: string,
   method: HttpMethod,
   options: FetchOptionsExtend,
-  keyPrefix: string,
 ): string {
-  const key = `${keyPrefix}${baseURL}_${url}_${method.toUpperCase()}`
+  const key = `${baseURL}_${url}_${method.toUpperCase()}`
+
   try {
     return options.query ? `${key}_${objectHash(options.query)}` : key
   }
@@ -346,26 +194,22 @@ function generateCacheKey(
   }
 }
 
-// ========================= Nuxt API 插件主入口 =========================
 export default defineNuxtPlugin((nuxtApp) => {
-  const runtimeConfig = useRuntimeConfig()
-  const { apiPlugin } = runtimeConfig.public
+  const i18n = nuxtApp.$i18n as any
+  const { apiPlugin } = useRuntimeConfig().public
+
   if (apiPlugin) {
     syncApiConfig(apiPlugin)
   }
 
   const authStore = useAuthStore()
-  const i18n = nuxtApp.$i18n as any
+  const loadingStore = useLoadingStore()
+
   const requestCache = useState<Record<string, RequestCacheItem>>(
     'request_cache',
     () => ({}),
   )
 
-  /**
-   * 请求取消控制器Map：存储所有正在进行的请求
-   * key: abortKey
-   * value: 控制器+请求信息
-   */
   const abortStateMap = new Map<
     string,
     {
@@ -376,57 +220,39 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   >()
 
-  const loadingStore = useLoadingStore()
-
-  // 定时器
-  let cacheCleanTimer: Timer = null
-  let flightRequestCleanTimer: Timer = null
-
-  // ========================= Loading 状态管理 =========================
-
   const loadingMap = new Map<string, number>()
 
-  function startLoading(key: string) {
-    const val = (loadingMap.get(key) || 0) + 1
+  function startLoading(loadingKey: string) {
+    const val = (loadingMap.get(loadingKey) || 0) + 1
 
-    loadingStore.open(key)
+    loadingStore.open(loadingKey)
 
-    loadingMap.set(key, val)
+    loadingMap.set(loadingKey, val)
   }
 
-  function stopLoading(key: string) {
-    if (!loadingMap.has(key))
+  function stopLoading(loadingKey: string) {
+    if (!loadingMap.has(loadingKey))
       return
 
-    const val = (loadingMap.get(key) || 0) - 1
+    const val = (loadingMap.get(loadingKey) || 0) - 1
 
     if (val === 0) {
-      loadingStore.close(key)
+      loadingStore.close(loadingKey)
 
-      loadingMap.delete(key)
+      loadingMap.delete(loadingKey)
     }
     else {
-      loadingMap.set(key, val)
+      loadingMap.set(loadingKey, val)
     }
   }
 
-  // ========================= 请求清理/取消 =========================
-  /**
-   * 清理单个请求（关闭loading+移除控制器）
-   * @param key 取消键
-   */
-  const clearRequest = (abortKey: string, loadingKey: string): void => {
+  function clearRequest(abortKey: string, loadingKey: string): void {
     stopLoading(loadingKey)
 
     abortStateMap.delete(abortKey)
   }
 
-  /**
-   * 取消单个请求
-   * @param abortKey 取消键
-   * @param reason 取消原因
-   */
-  const cancelReq = (abortKey: string, reason = ''): void => {
+  function cancelReq(abortKey: string, reason = ''): void {
     const abortState = abortStateMap.get(abortKey)
 
     if (!abortState) {
@@ -438,23 +264,14 @@ export default defineNuxtPlugin((nuxtApp) => {
     clearRequest(abortKey, abortState.loadingKey || '')
   }
 
-  /**
-   * 取消所有请求
-   * @param reason 取消原因
-   */
-  const cancelAllReq = (reason = '路由跳转'): void => {
+  function cancelAllReq(reason = '路由跳转'): void {
     abortStateMap.forEach((val, abortKey) => cancelReq(abortKey, reason))
   }
 
-  /**
-   * 取消指定组件的所有请求（组件销毁时调用）
-   * @param componentKey 组件标识
-   * @param reason 取消原因
-   */
-  const cancelComponentAllReq = (
+  function cancelComponentAllReq(
     componentKey: string,
     reason = '组件销毁',
-  ): void => {
+  ): void {
     abortStateMap.forEach((val, abortKey) => {
       if (componentKey && componentKey === val.componentKey) {
         cancelReq(abortKey, reason)
@@ -462,24 +279,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
   }
 
-  /**
-   * 清理超时请求（30秒未完成自动取消）
-   */
-  const cleanExpiredFlightRequests = (): void => {
-    const expireTime = Date.now() - 30 * 1000
-    abortStateMap.forEach(({ inFlightRequest }, abortKey) => {
-      if (expireTime > inFlightRequest.createTime) {
-        cancelReq(abortKey, '请求超时，自动取消')
-      }
-    })
-  }
-
-  // ========================= 缓存管理 =========================
-  /**
-   * 清理缓存（单个/全部）
-   * @param key 缓存键（可选）
-   */
-  const clearReqCache = (key?: string): void => {
+  function clearReqCache(key?: string): void {
     if (key) {
       const { [key]: _, ...newCache } = requestCache.value
       requestCache.value = newCache
@@ -489,26 +289,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   }
 
-  /**
-   * 清理所有缓存定时器
-   */
-  const cleanCacheTimer = (): void => {
-    if (cacheCleanTimer) {
-      clearInterval(cacheCleanTimer)
-    }
-
-    if (flightRequestCleanTimer) {
-      clearInterval(flightRequestCleanTimer)
-    }
-
-    cacheCleanTimer = null
-    flightRequestCleanTimer = null
-  }
-
-  /**
-   * 清理过期缓存+LRU淘汰（超出最大数量时删除最久未使用）
-   */
-  const cleanExpiredCache = (): void => {
+  function cleanExpiredCache(): void {
     if (!customCacheConfig.maxSize) {
       return
     }
@@ -516,7 +297,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     const now = Date.now()
     const currentCache = { ...requestCache.value }
 
-    // 过滤未过期缓存
     const validCache = Object.entries(currentCache).reduce(
       (acc, [key, item]) => {
         if (item.expireTime >= now) {
@@ -529,12 +309,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     )
 
     const cacheKeys = Object.keys(validCache)
+
     if (cacheKeys.length <= customCacheConfig.maxSize) {
       requestCache.value = validCache
       return
     }
 
-    // LRU：按最后访问时间排序，保留最新的
     const sortedKeys = cacheKeys.sort((a, b) => {
       const timeA = validCache[a]?.lastAccessTime ?? 0
       const timeB = validCache[b]?.lastAccessTime ?? 0
@@ -542,7 +322,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       return timeB - timeA
     })
 
-    // 保留指定数量的缓存
     const finalCache = sortedKeys.slice(0, customCacheConfig.maxSize).reduce(
       (acc, key) => {
         const cacheItem = validCache[key]
@@ -558,37 +337,23 @@ export default defineNuxtPlugin((nuxtApp) => {
     requestCache.value = finalCache
   }
 
-  // ========================= 统一错误处理 =========================
-  /**
-   * 请求错误统一处理
-   * @param error 错误对象
-   * @param requestMeta 请求元数据
-   * @param apiConfig 实例配置
-   * @param options 请求配置
-   */
-  const handleRequestError = async (
+  async function handleRequestError(
     error: unknown,
     requestMeta: RequestMeta,
     apiConfig: ApiInstanceConfig,
     options: FetchOptionsExtend,
-  ): Promise<never> => {
+  ): Promise<never> {
     const fetchError = error as FetchError
     const { message, status, data } = fetchError
-    // 合并配置优先级：全局 < 实例 < 单次请求
+
     const lastCustomToastConfig: CustomToastConfig = {
       ...customToastConfig,
       ...apiConfig.customToast,
       ...options.customToast,
     }
 
-    let errorMsg: string | undefined
-    logRequest('error', requestMeta, {
-      data,
-      status,
-      error: message,
-    })
+    let errorMsg: string | undefined = message
 
-    // 错误类型匹配
     if (message.includes('tokenRefreshFailed')) {
       errorMsg = lastCustomToastConfig.tokenRefreshFailed
     }
@@ -599,10 +364,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       throw error
     }
 
-    if (message === lastCustomToastConfig.duplicateRequest) {
-      errorMsg = lastCustomToastConfig.duplicateRequest
-    }
-    else if (!status) {
+    if (!status) {
       errorMsg = lastCustomToastConfig.networkError
     }
     else if (status === 401) {
@@ -611,71 +373,51 @@ export default defineNuxtPlugin((nuxtApp) => {
     else if (status >= 500) {
       errorMsg = lastCustomToastConfig.serverError
     }
-    else if ((data as ErrorResponse).success === false) {
-      errorMsg = lastCustomToastConfig.businessError?.replace('{msg}', data.message || '')
-    }
-    else {
-      errorMsg = message || lastCustomToastConfig.unknownError
+    else if (data.success === false) {
+      errorMsg = data.message
     }
 
-    // 执行错误钩子
+    const err = new Error(errorMsg, { cause: fetchError })
+
     try {
-      await apiConfig.hooks?.onError?.(requestMeta, new Error(errorMsg, { cause: fetchError }))
+      await apiConfig.hooks?.onError?.(requestMeta, err)
     }
     catch (e) {
       console.error('[API] 错误处理失败', e)
       errorMsg = lastCustomToastConfig.requestError
     }
     finally {
-      // 客户端弹出提示
       if (import.meta.client) {
-        const translatedMsg = translateMessage(errorMsg || '', i18n)
-        toastFn(translatedMsg)
+        toastFn(translateMessage(errorMsg || '', i18n))
       }
     }
 
-    throw new Error(errorMsg, { cause: fetchError })
+    throw err
   }
 
-  // ========================= Token 刷新管理器（核心） =========================
-  /**
-   * Token 刷新管理器（单例模式）
-   * 解决：并发请求401时，只刷新一次token，所有请求等待结果
-   */
   class TokenRefreshManager {
     private refreshing = false
-    // 等待队列：存储所有等待token刷新的请求
+
     private waiters: Array<{
       resolve: (value: boolean) => void
       reject: (reason: Error) => void
     }> = []
 
-    /**
-     * 是否正在刷新token
-     */
     get isRefreshing() {
       return this.refreshing
     }
 
-    /**
-     * 等待token刷新完成
-     * @returns 刷新结果
-     */
     async waitForRefresh(): Promise<boolean> {
       if (!this.refreshing) {
         return true
       }
+
       return new Promise((resolve, reject) => {
         this.waiters.push({ resolve, reject })
       })
     }
 
-    /**
-     * 执行token刷新
-     * @returns 刷新结果
-     */
     async doRefresh(): Promise<boolean> {
-      // 防止重复刷新
       if (this.refreshing) {
         return this.waitForRefresh()
       }
@@ -683,15 +425,12 @@ export default defineNuxtPlugin((nuxtApp) => {
       this.refreshing = true
 
       try {
-        // 调用store刷新token
         const newToken = await authStore.getRefreshToken()
-        if (!newToken) {
-          authStore.clear()
 
+        if (!newToken) {
           throw new Error('tokenRefreshFailed')
         }
 
-        // 刷新成功：通知所有等待请求
         this.refreshing = false
         const waiters = [...this.waiters]
         this.waiters = []
@@ -700,32 +439,27 @@ export default defineNuxtPlugin((nuxtApp) => {
         return true
       }
       catch (err) {
-        // 刷新失败：拒绝所有等待请求 + 清空token + 跳转登录
         this.refreshing = false
+
         const error = new Error(customToastConfig.tokenExpired, { cause: err })
         const waiters = [...this.waiters]
         this.waiters = []
         waiters.forEach(w => w.reject(error))
 
         authStore.clear()
+
         if (import.meta.client) {
           await nuxtApp.runWithContext(() => authStore.toLogin())
         }
+
         throw error
       }
     }
   }
 
-  // 创建token刷新管理器单例
   const tokenRefreshManager = new TokenRefreshManager()
 
-  // ========================= 请求重试 + 超时 + Token 刷新核心 =========================
-  /**
-   * 请求重试逻辑
-   * @param param0 配置参数
-   * @returns 请求结果
-   */
-  const retryRequest = async <T>({
+  async function retryRequest<T>({
     abortKey,
     apiConfig,
     options,
@@ -741,8 +475,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     retry?: number
     timeout?: number
     isAfterRefresh?: boolean
-  }): Promise<T> => {
-    // 合并配置
+  }): Promise<T> {
     const lastCustomRequestConfig: CustomRequestConfig = {
       ...customRequestConfig,
       ...apiConfig.customRequest,
@@ -758,26 +491,27 @@ export default defineNuxtPlugin((nuxtApp) => {
     let timer: Timer = null
 
     try {
-      // 如果正在刷新token，等待结果
       if (tokenRefreshManager.isRefreshing && lastCustomRequestConfig.token) {
         const refreshSuccess = await tokenRefreshManager.waitForRefresh()
+
         if (!refreshSuccess) {
           throw new Error('tokenRefreshFailed')
         }
+
         return retryRequest({ abortKey, apiConfig, options, fetchFn, retry, isAfterRefresh: true })
       }
 
-      // 请求超时处理
       timer = setTimeout(() => {
         const abortState = abortStateMap.get(abortKey)
+
         if (abortState) {
           abortState.abortController.abort('timeout')
           abortState.abortController = new AbortController()
         }
-        clearTimeout(timer!)
+
+        timer && clearTimeout(timer)
       }, timeout)
 
-      // 执行请求
       const res = await fetchFn()
 
       timer && clearTimeout(timer)
@@ -786,15 +520,14 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
     catch (error) {
       timer && clearTimeout(timer)
+
       const fetchError = error as FetchError
 
-      // 超时重试逻辑
       if (
         fetchError.message?.includes('timeout')
         && lastCustomRetryConfig.maxCount
         && retry < lastCustomRetryConfig.maxCount
       ) {
-        // 指数退避算法
         const delay = Math.min(
           (lastCustomRetryConfig.baseDelay ?? 0) * 2 ** retry * (0.8 + Math.random() * 0.4),
           lastCustomRetryConfig.maxDelay ?? 0,
@@ -811,20 +544,18 @@ export default defineNuxtPlugin((nuxtApp) => {
         })
       }
 
-      // 非401错误直接抛出，已经刷新过token仍失败，直接抛出
       if (fetchError.status !== 401 || isAfterRefresh) {
         throw error
       }
 
-      // 正在刷新，等待结果
       if (tokenRefreshManager.isRefreshing) {
         const refreshSuccess = await tokenRefreshManager.waitForRefresh()
+
         if (!refreshSuccess) {
           throw new Error('tokenRefreshFailed')
         }
       }
       else {
-        // 执行token刷新
         await tokenRefreshManager.doRefresh()
       }
 
@@ -832,19 +563,11 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   }
 
-  // ========================= 请求配置预处理 =========================
-  /**
-   * 预处理请求配置（添加token、csrf、序列化等）
-   * @param fullUrl 完整请求地址
-   * @param apiConfig 实例配置
-   * @param options 请求配置
-   * @returns 处理后的配置
-   */
-  const processRequestOptions = async (
+  async function processRequestOptions(
     fullUrl: string,
     apiConfig: ApiInstanceConfig,
     options: FetchOptionsExtend,
-  ): Promise<FetchOptionsExtend> => {
+  ): Promise<FetchOptionsExtend> {
     try {
       const token = authStore.getToken()
       const csrfToken = getCsrfToken()
@@ -860,20 +583,18 @@ export default defineNuxtPlugin((nuxtApp) => {
         ...options.customRequest,
       }
 
-      // 添加Content-Type
       if (!normalizedHeaders['Content-Type'] && lastHeaders.contentType) {
         normalizedHeaders['Content-Type'] = lastHeaders.contentType
       }
-      // 添加CSRF Token
+
       if (csrfToken && lastHeaders.csrfToken) {
         normalizedHeaders[lastHeaders.csrfToken] = csrfToken
       }
-      // 添加认证Token
+
       if (token && lastCustomRequestConfig.token && lastHeaders.token) {
         normalizedHeaders[lastHeaders.token] = `Bearer ${token}`
       }
 
-      // 合并所有配置
       const processedOptions: FetchOptionsExtend = {
         ...fetchOptionConfig,
         ...apiConfig,
@@ -881,7 +602,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         headers: normalizedHeaders,
       }
 
-      // FormData序列化
       if (
         lastCustomRequestConfig.serializeForm
         && processedOptions.body instanceof FormData
@@ -889,10 +609,9 @@ export default defineNuxtPlugin((nuxtApp) => {
         processedOptions.body = Object.fromEntries(processedOptions.body.entries())
       }
 
-      // 执行请求前钩子
       await apiConfig.hooks?.beforeRequest?.({
         url: fullUrl,
-        method: options.method || 'GET',
+        method: options.method || 'get',
         query: options.query,
         body: options.body,
       }, processedOptions)
@@ -905,22 +624,10 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
   }
 
-  // ========================= 创建 API 客户端 =========================
-  /**
-   * 创建API请求客户端
-   * @param apiConfig 实例配置
-   * @returns 请求函数
-   */
-  const createApiClient = (apiConfig: ApiInstanceConfig = {}) => {
+  function createApiClient(apiConfig: ApiInstanceConfig = {}) {
     const fetchInstance = $fetch.create({})
 
-    /**
-     * 核心请求函数
-     * @param url 请求地址
-     * @param options 请求配置
-     * @returns 请求结果
-     */
-    const request = async <T>(
+    return async <T>(
       url: string,
       options: FetchOptionsExtend,
     ): Promise<T> => {
@@ -931,14 +638,14 @@ export default defineNuxtPlugin((nuxtApp) => {
         ...apiConfig.customRequest,
         ...options.customRequest,
       }
-      const method = options.method || 'GET'
+      const method = (options.method?.toLowerCase() || 'get') as HttpMethod
+
       const {
-        abortKey = generateAbortKey(baseURL, url, method, options, apiConfig),
         componentKey,
         loadingKey = 'global',
+        abortKey = generateAbortKey(baseURL, url, method, options),
       } = lastCustomRequestConfig
 
-      // 请求元数据
       const requestMeta: RequestMeta = {
         url: fullUrl,
         method,
@@ -946,61 +653,48 @@ export default defineNuxtPlugin((nuxtApp) => {
         body: options.body,
       }
 
-      // 重复请求拦截：相同请求直接返回正在进行的Promise
       const inFlightRequest = abortStateMap.get(abortKey)?.inFlightRequest
       if (inFlightRequest) {
-        const lastCustomToastConfig: CustomToastConfig = {
-          ...customToastConfig,
-          ...apiConfig.customToast,
-          ...options.customToast,
-        }
-        logRequest('request', requestMeta, {
-          status: -1,
-          data: lastCustomToastConfig.duplicateRequest,
-        })
         return inFlightRequest.promise as T
       }
 
-      // 合并缓存配置
       const lastCustomCacheConfig: CustomCacheConfig = {
         ...customCacheConfig,
         ...apiConfig.customCache,
         ...options.customCache,
       }
       let cacheKey = ''
-      // 缓存读取：命中缓存直接返回
-      if (lastCustomCacheConfig?.enable) {
-        cacheKey = generateCacheKey(
-          baseURL,
-          url,
-          method,
-          options,
-          lastCustomCacheConfig.keyPrefix || '',
-        )
+
+      if (lastCustomCacheConfig.enable) {
+        cacheKey = generateCacheKey(baseURL, url, method, options)
+
         const cacheItem = requestCache.value[cacheKey]
-        if (cacheItem && cacheItem.expireTime > Date.now()) {
-          cacheItem.lastAccessTime = Date.now()
-          requestCache.value = { ...requestCache.value, [cacheKey]: cacheItem }
-          logRequest('response', requestMeta, { status: 20, data: '从缓存读取' })
-          return cacheItem.data as T
+        const now = Date.now()
+
+        if (cacheItem) {
+          if (cacheItem.expireTime >= now) {
+            cacheItem.lastAccessTime = now
+            requestCache.value[cacheKey] = cacheItem
+
+            return cacheItem.data as T
+          }
+          else {
+            cleanExpiredCache()
+          }
         }
       }
 
-      // 创建请求取消控制器
       const abortController = new AbortController()
-      // 包装请求Promise
+
       const requestPromise = (async (): Promise<T> => {
         try {
-          const startTime = Date.now()
-          logRequest('request', requestMeta)
-
-          // 执行带重试/刷新token的请求
           const response = await retryRequest({
             abortKey,
             apiConfig,
             options,
             fetchFn: async () => {
               const processedOptions = await processRequestOptions(fullUrl, apiConfig, options)
+
               return fetchInstance<T>(url, {
                 ...processedOptions,
                 signal: abortController.signal,
@@ -1008,46 +702,32 @@ export default defineNuxtPlugin((nuxtApp) => {
             },
           })
 
-          // 执行请求后钩子
           await apiConfig.hooks?.afterResponse?.(requestMeta, response)
 
-          // 写入缓存
           if (
             lastCustomCacheConfig.enable
             && lastCustomCacheConfig.ttl
             && cacheKey
             && response
           ) {
-            requestCache.value = {
-              ...requestCache.value,
-              [cacheKey]: {
-                data: response,
-                expireTime: Date.now() + lastCustomCacheConfig.ttl,
-                lastAccessTime: Date.now(),
-              },
-            }
-            // 定期清理缓存
-            Date.now() % 10 === 0 && cleanExpiredCache()
-          }
+            const now = Date.now()
 
-          logRequest('response', requestMeta, {
-            status: 200,
-            data: response,
-            duration: Date.now() - startTime,
-          })
+            requestCache.value[cacheKey] = {
+              data: response,
+              expireTime: now + lastCustomCacheConfig.ttl,
+              lastAccessTime: now,
+            }
+          }
           return response as T
         }
         catch (error) {
-          // 统一错误处理
           throw await handleRequestError(error, requestMeta, apiConfig, options)
         }
         finally {
-          // 无论成功失败，清理请求
           clearRequest(abortKey, loadingKey)
         }
       })()
 
-      // 存储请求控制器
       abortStateMap.set(abortKey, {
         abortController,
         inFlightRequest: { promise: requestPromise, createTime: Date.now() },
@@ -1055,32 +735,18 @@ export default defineNuxtPlugin((nuxtApp) => {
         loadingKey,
       })
 
-      // 开启Loading
       startLoading(loadingKey)
 
       return requestPromise
     }
-
-    return request
   }
 
-  // ========================= 客户端生命周期 =========================
   if (import.meta.client) {
-    // 启动缓存清理定时器
-    if (customCacheConfig.cleanInterval) {
-      cacheCleanTimer = setInterval(cleanExpiredCache, customCacheConfig.cleanInterval)
-    }
-    // 启动超时请求清理定时器
-    flightRequestCleanTimer = setInterval(cleanExpiredFlightRequests, 5 * 60 * 1000)
-
-    // 页面卸载时清理所有资源
     window.addEventListener('beforeunload', () => {
-      cleanCacheTimer()
       cancelAllReq('页面卸载，取消请求')
     })
   }
 
-  // 向全局提供API方法
   return {
     provide: {
       api: createApiClient(),

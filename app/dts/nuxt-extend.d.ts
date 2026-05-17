@@ -1,5 +1,5 @@
 import type { FetchInstance } from 'ofetch'
-import type { ApiPluginConfig, FetchOptionsExtend } from '~/types/http'
+import type { FetchOptionsExtend } from '~/types/http'
 import 'nuxt/app'
 
 interface API {
@@ -19,11 +19,11 @@ declare module 'nuxt/schema' {
 declare module 'nuxt/app' {
   interface UseFetchOptions extends FetchOptionsExtend { }
 
-  type NuxtApp = API
+  interface NuxtApp extends API {}
 }
 
 declare module '@vue/runtime-core' {
-  type ComponentCustomProperties = API
+  interface ComponentCustomProperties extends API {}
 }
 
 export {}

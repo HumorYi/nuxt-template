@@ -1,13 +1,19 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { registerApiToast } from '@/plugins/api'
+
+registerApiToast((msg) => {
+  console.log(msg)
+})
+</script>
 
 <template>
   <CustomLoading />
 
-  <LanguageSwitcher />
-
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+  <Suspense>
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </Suspense>
 </template>
 
 <style scoped lang="scss"></style>

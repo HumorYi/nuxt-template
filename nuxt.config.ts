@@ -45,11 +45,13 @@ export default defineNuxtConfig({
   runtimeConfig: {
     apiSecret: env.API_SECRET,
     public: {
-      apiBase: env.NUXT_PUBLIC_API_BASE,
-      apiOtherBase: env.NUXT_PUBLIC_API_OTHER_BASE,
-      apiUrl: env.NUXT_PUBLIC_API_URL,
-      apiOtherUrl: env.NUXT_PUBLIC_API_OTHER_URL,
-      apiPlugin: {} as ApiPluginConfig,
+      apiUrl: isDev ? env.NUXT_PUBLIC_API_BASE : env.NUXT_PUBLIC_API_URL,
+      apiOtherUrl: isDev ? env.NUXT_PUBLIC_API_OTHER_BASE : env.NUXT_PUBLIC_API_OTHER_URL,
+      apiPlugin: {
+        customRetry: {
+          maxCount: 0, // 0 不重试, n 重试 n 次
+        }
+      } as ApiPluginConfig,
       site: {
         url: env.NUXT_SITE_URL || '',
         logo: env.NUXT_SITE_LOGO || '',

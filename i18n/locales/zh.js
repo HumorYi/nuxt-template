@@ -20,7 +20,7 @@ export default {
     "csrfError": "CSRF 令牌验证失败，请刷新页面",
     "emptyToken": "登录凭证为空，请重新登录",
     "tokenExpired": "登录状态已过期，请重新登录",
-    "tokenRefreshFailed": "Token刷新失败",
+    "tokenRefreshFailed": "登录状态已过期，请重新登录",
     "requestError": "请求处理异常，请稍后重试"
   },
   "layouts": {

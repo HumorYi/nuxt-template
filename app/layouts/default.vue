@@ -4,7 +4,11 @@ const langLayout = useLangLayout()
 
 <template>
   <div>
-    <header>{{ langLayout('header') }}</header>
+    <header>
+      <section>{{ langLayout('header') }}</section>
+
+      <LanguageSwitcher />
+    </header>
 
     <slot />
 
